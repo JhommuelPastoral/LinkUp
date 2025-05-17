@@ -20,8 +20,7 @@ const protectedRoute = async (req, res, next) => {
 
   } catch (error) {
     console.log("protectedRoute", error.message); 
-    return res.status(401).json({sucess: false, message: "Not authorized"});
-
+    return null
   }
 
 };

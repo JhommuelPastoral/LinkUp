@@ -21,39 +21,30 @@ export const post = async (req,res,io) => {
   }
 }
 
-export const getPosts = async (req,res) => {
+
+
+export const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find({}).populate("userId", "fullname profileImage isOnline").sort({createdAt: -1});
-    res.status(200).json({posts});
+    const page = parseInt(req.query.page) || 1; 
+    const limit = 5; 
+    const skip = (page - 1) * limit;
+
+    const totalPosts = await Post.countDocuments();
+
+    const posts = await Post.find({})
+      .populate("userId", "fullname profileImage isOnline")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const hasMore = page * limit < totalPosts;
+
+    res.status(200).json({ posts, hasMore });
   } catch (error) {
     console.log("getPosts error", error.message);
-    res.status(500).json({message: error.message});
+    res.status(500).json({ message: error.message });
   }
-}
-
-// export const getPosts = async (req, res) => {
-//   try {
-//     const page = parseInt(req.query.page) || 1; // Default to page 1
-//     const limit = parseInt(req.query.limit) || 10; // Default to 10 posts per page
-//     const skip = (page - 1) * limit;
-
-//     // Get total count to determine if there's a next page
-//     const totalPosts = await Post.countDocuments();
-
-//     const posts = await Post.find({})
-//       .populate("userId", "fullname profileImage isOnline")
-//       .sort({ createdAt: -1 })
-//       .skip(skip)
-//       .limit(limit);
-
-//     const hasMore = page * limit < totalPosts;
-
-//     res.status(200).json({ posts, hasMore });
-//   } catch (error) {
-//     console.log("getPosts error", error.message);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+};
 
 
 export const likePosts = async (req,res,io) => {

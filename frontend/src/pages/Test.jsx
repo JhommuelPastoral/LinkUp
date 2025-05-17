@@ -5,7 +5,7 @@ import {io} from 'socket.io-client';
 import useAuthUser  from "../hooks/useAuthUser.js";
 import toast from 'react-hot-toast';
 
-export default function SuggestedFriends() {
+export default function Test() {
   const { authData } = useAuthUser();
   const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;

@@ -1,11 +1,11 @@
 import { House, Search, Send, Compass, UserSearch, Users, UserPlus } from 'lucide-react';
-import { useLocation, Link } from 'react-router';
+import { useLocation, Link , useNavigate} from 'react-router';
 import useAuthUser from '../hooks/useAuthUser.js';
 import ThemeSelector from './ThemeSelector.jsx';
 import { logout, getIncomingFriendRequests, getOutgoingFriendRequests, getRecommendUser, getFriends } from '../lib/api.js';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { useEffect, useState, useRef, use } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 const navLinks = [
   { to: '/home', label: 'Home', icon: <House size={20} /> },
@@ -24,6 +24,8 @@ export default function SideBar() {
   const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [filterRecommendAcc, setFilterRecommendAcc ] = useState([]);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [badgeCounts, setBadgeCounts] = useState({
     'Friend Requests': 0,
     'Suggested Friends': 0,

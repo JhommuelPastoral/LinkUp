@@ -33,7 +33,7 @@ export const signup = async (signupData)=>{
 
 export const getRecommendUser = async ()=>{
   try {
-    const response = await axiosInstance.get("/user/");
+    const response = await axiosInstance.get("/user");
     return response.data;
   } catch (error) {
     console.log("getRecommendUser", error.message);
@@ -56,7 +56,7 @@ export const logout = async ()=>{
     const response = await axiosInstance.post("/auth/logout");
     return response.data;
   } catch (error) {
-    throw  Error(error.response?.data?.message );
+    return null
   }
 }
 
@@ -125,23 +125,33 @@ export const post = async (data)=>{
   }
 }
 
-export const getPosts = async ()=>{
+// export const getPosts = async ()=>{
+//   try {
+//     const response = await axiosInstance.get("/user/getposts");
+//     return response.data;
+//   } catch (error) {
+//     throw  Error(error.response?.data?.message );
+//   }
+// }
+
+export const getPosts = async ({ pageParam}) => {
   try {
-    const response = await axiosInstance.get("/user/getposts");
+    const res = await axiosInstance.get(`/user/getposts?page=${pageParam}`);
+    return res.data;
+  } catch (err) {
+    throw new Error(err.response?.data?.message || 'Failed to fetch posts');
+  }
+};
+
+
+export const getSingleRecommendeduser = async ({pageParam})=>{
+  try {
+    const response = await axiosInstance.get(`/user/recommended?page=${pageParam}`);
     return response.data;
   } catch (error) {
     throw  Error(error.response?.data?.message );
   }
 }
-
-// export const getPosts = async ({ pageParam = 1 }) => {
-//   try {
-//     const res = await axiosInstance.get(`/user/getposts?page=${pageParam}`);
-//     return res.data;
-//   } catch (err) {
-//     throw new Error(err.response?.data?.message || 'Failed to fetch posts');
-//   }
-// };
 
 
 export const addLike = async (id)=>{

@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 import FriendRequest from "../models/friendRequest.js";
-import Post from '../models/Post.js';
+
 export const getRecommendedFriends = async (req,res) => {
   try {
     const currentUserId = req.user._id;
@@ -17,6 +17,66 @@ export const getRecommendedFriends = async (req,res) => {
     console.log("getRecommendedFriends", error.message);
   }
 }
+
+export const getSingleRecommendeduser = async (req,res) => {
+  try {
+    const page = req.query.page;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+    const currentUserId = req.user._id;
+    const currentUser = await User.findById(currentUserId);
+
+    const recommendUser = await User.find({
+      $and:[
+        {_id: {$ne: currentUserId}},
+        {_id: {$nin: currentUser.friends}},
+        {isOnboarded: true}
+      ]
+    }).select('-password').skip(skip).limit(limit);
+
+
+    const hasMore = page * limit < recommendUser.length;
+    return res.status(200).json({ hasMore, recommendUser});
+
+  } catch (error) {
+    console.log("getIncomingFriendRequests", error.message);
+  }
+}
+
+// export const getSingleRecommendeduser = async (req,res) => {
+//   try {
+//     const page = req.query.page;
+//     const limit = 5;
+//     const skip = (page - 1) * limit;
+//     const currentUserId = req.user._id;
+
+//     const currentUser = await User.findById(currentUserId);
+//     const filter = {
+//       $and:[
+//         {_id: {$ne: currentUserId}},
+//         {_id: {$nin: currentUser.friends}},
+//         {isOnboarded: true},
+//       ]
+//     };
+
+//     const test = await User.find({
+//       $and:[
+//         {_id: {$ne: currentUserId}},
+//         {_id: {$nin: currentUser.friends}},
+//         {isOnboarded: true}
+//       ]
+//     })
+//     console.log(test.length);
+
+//     const totalMatchingUsers = await User.countDocuments(filter);
+//     const recommendUser = await User.find(filter).select('-password').skip(skip).limit(limit);
+//     const hasMore = page * limit < totalMatchingUsers;
+//     return res.status(200).json({ hasMore, recommendUser});
+
+//   } catch (error) {
+//     console.log("getIncomingFriendRequests", error.message);
+//   }
+// }
 
 export const getFriends = async (req,res) => {
   try {

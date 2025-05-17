@@ -10,7 +10,7 @@ import useAuthUser from './hooks/useAuthUser.js';
 import SuggestedFriends from './pages/SuggestedFriends.jsx';
 import FriendRequestPage from './pages/FriendRequestPage.jsx';
 import FriendPage from './pages/FriendPage.jsx';
-
+import Test from './pages/Test.jsx';
 import {Routes, Route} from 'react-router';
 import { Toaster } from 'react-hot-toast';
 import { Navigate } from 'react-router';
@@ -38,6 +38,7 @@ export default function App() {
         <Route path='/explore/friends' element={ !isAuthenticated ? <Navigate to="/login" /> : !isOnboarding ? <Navigate to="/onboarding" /> :  <LayoutPage> <SuggestedFriends/></LayoutPage> }></Route>
         <Route path='/requested/friends' element={ !isAuthenticated ? <Navigate to="/login" /> : !isOnboarding ? <Navigate to="/onboarding" /> :  <LayoutPage> <FriendRequestPage/></LayoutPage> }></Route>
         <Route path='/friends' element={ !isAuthenticated ? <Navigate to="/login" /> : !isOnboarding ? <Navigate to="/onboarding" /> :  <LayoutPage> <FriendPage/></LayoutPage> }></Route>
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
     </div>
