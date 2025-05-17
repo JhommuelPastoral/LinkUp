@@ -111,7 +111,7 @@ export default function LoginPage() {
             </div>
 
             <button className="btn btn-primary w-full" onClick={handleSubmit} >Sign In</button>
-            <p className="text-center text-sm">Don't have an account? <Link className="text-primary" to="/signup"> Sign up</Link> </p>
+            <p className="text-center text-sm">Don't have an account? <Link className="font-semibold" to="/signup"> Sign up</Link> </p>
 
           </form>
 

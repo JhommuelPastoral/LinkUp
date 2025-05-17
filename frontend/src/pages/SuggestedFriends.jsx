@@ -59,10 +59,10 @@ export default function SuggestedFriends() {
     socket.current.on(`incomingFriendRequests${authData?.user?._id.toString()}`, () => {
       incomingFriendRequestsRefetch();
     });
-    const outgoingFriendRequests = getOutgoingFriend?.outgoingFriendRequests?.map((req) => req.reciptient?._id);
-    const incomingFriendRequests = getIncomingFriend?.incomingFriendRequests?.map((req) => req.sender?._id);
-    const flatRecommended = recommended?.pages?.flatMap((page) => page.recommendUser);
-    const filtered = flatRecommended?.filter((acc) => !outgoingFriendRequests?.includes(acc?._id) && !incomingFriendRequests?.includes(acc?._id));
+    const outgoingFriendRequests = getOutgoingFriend?.outgoingFriendRequests?.map((req) => req.reciptient?._id) || [];
+    const incomingFriendRequests = getIncomingFriend?.incomingFriendRequests?.map((req) => req.sender?._id) || [];
+    const flatRecommended = recommended?.pages?.flatMap((page) => page.recommendUser) || [];
+    const filtered = flatRecommended?.filter((acc) => !outgoingFriendRequests?.includes(acc?._id) && !incomingFriendRequests?.includes(acc?._id)) || [];
     setFilterRecommendAcc(filtered);
     
   },[recommended, getOutgoingFriend, getIncomingFriend])
@@ -86,14 +86,20 @@ export default function SuggestedFriends() {
               </div>
               <div className="flex flex-col">
                 <p className="text-sm font-semibold">{acc?.fullname}</p>
-                <p className="text-xs">asd</p>
+                <p className="text-xs">{acc?.bio}</p>
               </div>
             </div>
             <button className="btn btn-sm" onClick={() => handleAddFriend(acc?._id)}> Send Request</button>
           </div>
           
         ))}
-        {hasNextPage && <button onClick={() => fetchNextPage()}>Load more</button>}
+        {hasNextPage ? (
+          <button onClick={() => fetchNextPage()} className="btn">
+            Load More
+          </button>
+        ) : (
+          <p className="text-center text-gray-500 mt-4">You're all caught up ✨</p>
+        )}
 
     </div>
   )

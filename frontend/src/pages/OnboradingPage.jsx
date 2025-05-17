@@ -13,14 +13,18 @@ export default function OnboradingPage() {
     profileImage: authData?.user?.profileImage || ""
   });
   const queryClient = useQueryClient();
+
   const{mutate: onboardingMutation, isLoading: isOnboardingLoading} = useMutation({
     mutationFn: OnboardingData,
     onSuccess: () => {
-      toast.success('Onboarding successfully!');
+      toast.success('Onboarding successfully!',{id: "onboarding"});
       queryClient.invalidateQueries(["authUser"]);
     },
+    onMutate: () => {
+      toast.loading('Onboarding...',{id: "onboarding"});
+    },
     onError: (error) => {
-      toast.error(error);
+      toast.error(error, {id: "onboarding"});
     }
   });
 
@@ -29,7 +33,7 @@ export default function OnboradingPage() {
     const reader = new FileReader();
 
     reader.onloadend = () => {
-      setPreviewUrl(reader.result);   // update image preview
+      setPreviewUrl(reader.result);  
       setOnboardingData(prev => ({ ...prev, profileImage: reader.result }));
 
     };
@@ -74,8 +78,15 @@ export default function OnboradingPage() {
             <p className='text-left text-sm'>Bio (Max 300 letters) </p>
             <textarea className="textarea resize-none w-full" placeholder="Tell us about yourself" maxLength={300} value={onboardingData.bio} onChange={(e) => setOnboardingData({ ...onboardingData, bio: e.target.value })} > </textarea>
           </div>
-          <button className='btn btn-primary'> {isOnboardingLoading ? <span className="loading loading-spinner"></span> : "Submit"} </button>
-
+          <button className='btn btn-primary' disabled={isOnboardingLoading}>
+            {isOnboardingLoading ? (
+              <>
+                <span className="loading loading-spinner"></span> Loading
+              </>
+            ) : (
+              "Submit"
+            )}
+          </button>
 
         </form>
       </div>

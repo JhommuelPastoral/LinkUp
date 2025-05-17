@@ -15,11 +15,13 @@ export default function RightSidebar() {
   const [outgoingRequest, setOutgoingRequest] = useState([]);
   const [ingoingRequest, setIngoingRequest] = useState([]);
   const [filterRecommendAcc, setFilterRecommendAcc] = useState([]);
-  
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const {data: recommendAcc=[], refetch: recommendUserRefetch} = useQuery({
     queryKey: ['recommendUser'],
     queryFn: getRecommendUser
   });
+  const hiddenLocation = ['/explore/friends', '/profile'];
+
 
   const {data: getOutgoingFriend=[], refetch: outGoingFriendRequestsRefetch} = useQuery({
     queryKey: ['outgoingFriendRequests'],
@@ -41,9 +43,6 @@ export default function RightSidebar() {
     }
   });
 
-
-
-
   useEffect(() => {
     if (!authData?.user?._id) return;
     Socket.current = io(backendUrl);
@@ -51,7 +50,7 @@ export default function RightSidebar() {
       recommendUserRefetch();
     });
     Socket.current.emit('user-connected',(authData?.user?._id));
-    Socket.current.on('user-connected', (userId) => {recommendUserRefetch();});
+    Socket.current.on('user-connected', () => {recommendUserRefetch();});
     Socket.current.on('recommendUser', () => {
       recommendUserRefetch();
     });
@@ -71,11 +70,20 @@ export default function RightSidebar() {
     });
 
     // Get all the ids in the outgoing friend request
-    getOutgoingFriend?.outgoingFriendRequests?.map((friend) => setOutgoingRequest( (prev) => [...prev, friend.reciptient._id.toString()]));
-    getIncomingFriend?.incomingFriendRequests?.map((friend) => setIngoingRequest( (prev) => [...prev, friend.sender._id.toString()]));
-    const filterAcc = recommendAcc?.recommendUser?.filter((acc) => !outgoingRequest?.includes(acc?._id.toString()) && !ingoingRequest?.includes(acc?._id.toString()));
+    const outgoingIds = getOutgoingFriend?.outgoingFriendRequests?.map(friend => friend.reciptient._id.toString()) || [];
+    const ingoingIds = getIncomingFriend?.incomingFriendRequests?.map(friend => friend.sender._id.toString()) || [];
+
+    setOutgoingRequest(outgoingIds);
+    setIngoingRequest(ingoingIds);
+
+    const filterAcc = recommendAcc?.recommendUser?.filter((acc) =>
+      !outgoingIds.includes(acc._id.toString()) &&
+      !ingoingIds.includes(acc._id.toString())
+    );
+    const onlineIds = recommendAcc?.recommendUser?.filter((acc) => acc.isOnline) || [];
+    setOnlineUsers(onlineIds);
     setFilterRecommendAcc(filterAcc);
-    return () => {
+        return () => {
       if (Socket.current) {
         Socket.current.off('user-connected');
         Socket.current.off('recommendUser');
@@ -90,11 +98,8 @@ export default function RightSidebar() {
   const handleAddFriend = (userId) => {
     handleAddFriendMutation(userId);
   }
-
-
-
   return (
-    <div className={`p-5 flex flex-col font-Poppins gap-5 ${currectLocation === '/explore/friends' ? 'hidden' : ''}`}>
+    <div className={`p-5 flex flex-col font-Poppins gap-5 ${hiddenLocation.includes(currectLocation) ? 'hidden' : ''}`}>
       <div className='flex  items-center'>
         <div className='w-15 h-15 rounded-full  '>
           <img src={authData?.user?.profileImage} alt={authData?.user?.fullname} className='w-15 h-15 object-cover object-center rounded-full' />
@@ -105,24 +110,30 @@ export default function RightSidebar() {
         </div>
       </div>
       <p className='text-sm text-current/80'>Suggested for you</p>
-      {filterRecommendAcc?.map((user) => (
-        user?.isOnline && (          
-          <div className='flex items-center flex-col' key={user._id}>
-            <div className='flex  items-center w-full'>
-              <div className='w-15 h-15 rounded-full  '>
-                <img src={user?.profileImage} alt={user?.fullname} className='w-15 h-15  object-cover object-center rounded-full' />
+      {onlineUsers.length === 0 ? <p className='text-sm text-current/80 text-center'>No online users</p>:
+        (
+          filterRecommendAcc?.map((user) => (
+            user?.isOnline && (          
+              <div className='flex items-center flex-col' key={user._id}>
+                <div className='flex  items-center w-full'>
+                  <div className='w-15 h-15 rounded-full relative '>
+                    <img src={user?.profileImage} alt={user?.fullname} className='w-15 h-15  object-cover object-center rounded-full' />
+                    <div aria-label="success" className="status status-success absolute bottom-1 right-0 w-4 h-4 rounded-full"></div>
+                  </div>
+                  <div className='flex flex-col ml-3'>
+                    <p className='text-sm'>{user?.fullname}</p>
+                    <p className='text-sm'>@{user?.fullname}</p>
+                  </div>
+                  <button className="btn btn-sm ml-auto bg-primary" onClick={() => handleAddFriend(user._id)}>Add Friend</button>
+                </div>
               </div>
-              <div className='flex flex-col ml-3'>
-                <p className='text-sm'>{user?.fullname}</p>
-                <p className='text-sm'>@{user?.fullname}</p>
-              </div>
-              <button className="btn btn-sm ml-auto bg-primary" onClick={() => handleAddFriend(user._id)}>Add Friend</button>
-            </div>
-          </div>
+            )
+            
+            
+          ))
+
         )
-        
-        
-      ))}
+      }
 
     </div>
   )

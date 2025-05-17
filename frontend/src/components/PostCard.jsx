@@ -16,16 +16,20 @@ export default function PostCard() {
   const socket = useRef(null);
 
   const {
-    data: postsData,
+    data: postsData = [],
     fetchNextPage,
     hasNextPage,
     refetch: postsRefetch,
   } = useInfiniteQuery({
     queryKey: ["posts"],
-    queryFn: ({ pageParam = 1 }) => getPosts({ pageParam }),
+    queryFn: ({ pageParam = 1 }) =>  getPosts({ pageParam }),
     getNextPageParam: (lastPage, allPages) => {
-      return lastPage?.hasMore ? allPages.length + 1 : undefined;
+      if (!lastPage || typeof lastPage.hasMore === 'undefined') {
+        return undefined;
+      }
+      return lastPage.hasMore ? allPages.length + 1 : undefined;
     },
+    initialPageParam: 1,
   });
 
   const { mutate: likePost } = useMutation({
@@ -50,7 +54,7 @@ export default function PostCard() {
     });
     socket.current.on("likePost", () => {
       postsRefetch();
-    })
+    });
     socket.current.on("userConnected", () => {
       postsRefetch();
     });
@@ -60,17 +64,18 @@ export default function PostCard() {
 
     return () => {
       socket.current.off("newPost");
+      socket.current.off("likePost");
       socket.current.off("userConnected");
-      socket.current.off("userDisconnected");
+      socket.current.off("user-disconnected");
       socket.current.disconnect();
     };
-  }, [postsData]);
+  }, [postsRefetch]);
 
   if (!authData?.user?._id) {
     return <div className="w-full min-h-screen bg-base-200 skeleton" />;
   }
 
-  const posts = postsData?.pages.flatMap((page) => page.posts) || [];
+  const posts = postsData?.pages?.flatMap((page) => page.posts) || [];
 
   return (
     <InfiniteScroll
@@ -120,13 +125,13 @@ export default function PostCard() {
             <Heart
               size={24}
               className="cursor-pointer"
-              fill={post.likes.includes(authData?.user?._id) ? "red" : "none"}
+              fill={post.likes.includes(authData.user._id) ? "red" : "none"}
               onClick={() => handleLike(post._id.toString())}
             />
             <MessageCircle size={24} />
           </div>
           <p className="text-gray-500 font-semibold">
-            {post.likes.length} {post.likes.length <= 1 ? "like" : "likes"}
+            {post.likes?.length} {post.likes?.length <= 1 ? "like" : "likes"}
           </p>
         </div>
       ))}

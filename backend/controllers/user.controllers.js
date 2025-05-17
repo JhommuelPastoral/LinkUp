@@ -11,35 +11,10 @@ export const getRecommendedFriends = async (req,res) => {
         {_id: {$nin: currentUser.friends}},
         {isOnboarded: true}
       ]
-    }).select('-password').limit(5);
+    }).select('-password')
     return res.status(200).json({recommendUser});
   } catch (error) {
     console.log("getRecommendedFriends", error.message);
-  }
-}
-
-export const getSingleRecommendeduser = async (req,res) => {
-  try {
-    const page = req.query.page;
-    const limit = 5;
-    const skip = (page - 1) * limit;
-    const currentUserId = req.user._id;
-    const currentUser = await User.findById(currentUserId);
-
-    const recommendUser = await User.find({
-      $and:[
-        {_id: {$ne: currentUserId}},
-        {_id: {$nin: currentUser.friends}},
-        {isOnboarded: true}
-      ]
-    }).select('-password').skip(skip).limit(limit);
-
-
-    const hasMore = page * limit < recommendUser.length;
-    return res.status(200).json({ hasMore, recommendUser});
-
-  } catch (error) {
-    console.log("getIncomingFriendRequests", error.message);
   }
 }
 
@@ -49,34 +24,50 @@ export const getSingleRecommendeduser = async (req,res) => {
 //     const limit = 5;
 //     const skip = (page - 1) * limit;
 //     const currentUserId = req.user._id;
-
 //     const currentUser = await User.findById(currentUserId);
-//     const filter = {
-//       $and:[
-//         {_id: {$ne: currentUserId}},
-//         {_id: {$nin: currentUser.friends}},
-//         {isOnboarded: true},
-//       ]
-//     };
 
-//     const test = await User.find({
+//     const recommendUser = await User.find({
 //       $and:[
 //         {_id: {$ne: currentUserId}},
 //         {_id: {$nin: currentUser.friends}},
 //         {isOnboarded: true}
 //       ]
-//     })
-//     console.log(test.length);
+//     }).select('-password').skip(skip).limit(limit);
 
-//     const totalMatchingUsers = await User.countDocuments(filter);
-//     const recommendUser = await User.find(filter).select('-password').skip(skip).limit(limit);
-//     const hasMore = page * limit < totalMatchingUsers;
+
+//     const hasMore = page * limit < recommendUser.length;
 //     return res.status(200).json({ hasMore, recommendUser});
 
 //   } catch (error) {
 //     console.log("getIncomingFriendRequests", error.message);
 //   }
 // }
+
+export const getSingleRecommendeduser = async (req,res) => {
+  try {
+    const page = req.query.page;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+    const currentUserId = req.user._id;
+
+    const currentUser = await User.findById(currentUserId);
+    const filter = {
+      $and:[
+        {_id: {$ne: currentUserId}},
+        {_id: {$nin: currentUser.friends}},
+        {isOnboarded: true},
+      ]
+    };
+
+    const totalMatchingUsers = await User.countDocuments(filter);
+    const recommendUser = await User.find(filter).select('-password').skip(skip).limit(limit);
+    const hasMore = page * limit < totalMatchingUsers;
+    return res.status(200).json({ hasMore, recommendUser});
+
+  } catch (error) {
+    console.log("getIncomingFriendRequests", error.message);
+  }
+}
 
 export const getFriends = async (req,res) => {
   try {
@@ -157,7 +148,7 @@ export const getOnlineUsers = async (req,res) => {
 
 export const getOutgoingFriendRequests = async (req,res,io) => {
   try {
-    const outgoingFriendRequests = await FriendRequest.find({sender: req.user._id, status: "pending"}).populate("reciptient", "fullname profileImage");
+    const outgoingFriendRequests = await FriendRequest.find({sender: req.user._id, status: "pending"}).populate("reciptient", "fullname profileImage bio");
     res.status(200).json({outgoingFriendRequests});
   } catch (error) {
     console.log("getOutgoingFriendRequests", error.message);
@@ -166,7 +157,7 @@ export const getOutgoingFriendRequests = async (req,res,io) => {
 
 export const getIncomingFriendRequests = async (req,res) => {
   try {
-    const incomingFriendRequests = await FriendRequest.find({reciptient: req.user._id, status: "pending"}).populate("sender", "fullname profileImage");
+    const incomingFriendRequests = await FriendRequest.find({reciptient: req.user._id, status: "pending"}).populate("sender", "fullname profileImage bio");
     res.status(200).json({incomingFriendRequests});
   } catch (error) {
     console.log("getIncomingFriendRequests", error.message);

@@ -38,7 +38,7 @@ export default function SignupPage() {
           <div className='p-[10px]'>
             <p className='text-current font-light text-sm'>START FOR FREE</p>
             <p className="text-current font-bold text-3xl">Create new account </p>
-            <p className="text-sm">Already a member? <Link className="text-primary" to="/login"> Sign in</Link> </p>
+            <p className="text-sm">Already a member? <Link className="font-semibold" to="/login"> Sign in</Link> </p>
           </div>
           <form className="w-full px-2.5 space-y-4">
             <div className='flex flex-col space-y-1'>

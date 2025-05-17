@@ -47,7 +47,7 @@ export default function FriendRequestPage() {
     acceptFriendRequestMutation(id);
   }
 
-  
+
   return (
     <div className="flex flex-col p-5  max-w-[600px] mx-auto font-Poppins gap-5" >
         <p className="text-sm  ">Suggested Friends</p>
@@ -65,7 +65,7 @@ export default function FriendRequestPage() {
               </div>
               <div className="flex flex-col">
                 <p className="text-sm font-semibold">{acc?.sender?.fullname}</p>
-                <p className="text-xs">asd</p>
+                <p className="text-xs">{acc?.sender?.bio}</p>
               </div>
             </div>
             <button className="btn btn-sm" onClick={() => handleAccceptFriend(acc?.sender?._id)}> Accept Request</button>

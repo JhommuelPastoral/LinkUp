@@ -12,7 +12,9 @@ export const post = async (req,res,io) => {
     });
     
     const post = await Post.create({userId, message, img: uploadResult.secure_url});
-    io.emit("newPost", post);
+    io.emit("newPost");
+    io.emit(`newPost${userId}`);
+
     res.status(200).json({message: "Post created successfully", post});
 
   } catch (error) {
@@ -45,6 +47,17 @@ export const getPosts = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getAllUserPosts = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const posts = await Post.find({ userId: userId })
+    res.status(200).json({ Allposts: posts });
+  } catch (error) {
+    console.log("getAllUserPosts error", error.message);
+    res.status(500).json({ message: error.message });
+  }
+}
 
 
 export const likePosts = async (req,res,io) => {

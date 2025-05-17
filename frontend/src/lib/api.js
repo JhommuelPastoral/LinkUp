@@ -162,3 +162,15 @@ export const addLike = async (id)=>{
     throw  Error(error.response?.data?.message );
   }
 }
+
+
+
+
+export const getAllUserPosts = async ()=>{
+  try {
+    const response = await axiosInstance.get(`/user/getuserposts`);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
