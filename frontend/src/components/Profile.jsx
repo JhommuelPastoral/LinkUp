@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {getAllUserPosts} from '../lib/api.js';
 import {io} from 'socket.io-client';
+import AllPost from "./AllPost.jsx";
 export default function Profile({authData}) {
   const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -51,8 +52,10 @@ export default function Profile({authData}) {
       friendsControl.stop();
     }
   }, [posts]);
+
   return (
-    <div className="flex gap-10 items-center justify-center">
+    <>
+      <div className="flex gap-10 items-center justify-center border-b border-base-300 pb-2.5">
       <div>
         <img src={authData?.user?.profileImage} className="w-30 h-30 rounded-full object-cover object-center" />
         <p className="font-semibold text-xl text-center">{authData?.user?.fullname}</p>
@@ -77,6 +80,8 @@ export default function Profile({authData}) {
           </div>
         </div>
       </div>
-    </div>  
+      </div>  
+      <AllPost posts={posts} authData={authData.user} />
+    </>
     )
 }

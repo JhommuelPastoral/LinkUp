@@ -1,5 +1,5 @@
 import useAuthUser from "../hooks/useAuthUser.js";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getPosts, addLike } from "../lib/api.js";
 import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import { io } from "socket.io-client";
@@ -8,6 +8,8 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import InfiniteScroll from "react-infinite-scroll-component";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
+
 dayjs.extend(relativeTime);
 
 export default function PostCard() {
@@ -15,10 +17,10 @@ export default function PostCard() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const socket = useRef(null);
 
-  if(!authData) return <div className="w-full min-h-screen bg-base-200 skeleton" />
+  if (!authData) return <div className="w-full min-h-screen bg-base-200 skeleton" />;
 
   const {
-    data: postsData=[],
+    data: postsData = [],
     fetchNextPage,
     hasNextPage,
     refetch: postsRefetch,
@@ -48,21 +50,14 @@ export default function PostCard() {
 
   useEffect(() => {
     socket.current = io(backendUrl);
-    socket.current.on("newPost", () => {
-      postsRefetch();
-    });
-    socket.current.on("likePost", () => {
-      postsRefetch();
-    })
-    socket.current.on("userConnected", () => {
-      postsRefetch();
-    });
-    socket.current.on("user-disconnected", () => {
-      postsRefetch();
-    });
+    socket.current.on("newPost", postsRefetch);
+    socket.current.on("likePost", postsRefetch);
+    socket.current.on("userConnected", postsRefetch);
+    socket.current.on("user-disconnected", postsRefetch);
 
     return () => {
       socket.current.off("newPost");
+      socket.current.off("likePost");
       socket.current.off("userConnected");
       socket.current.off("userDisconnected");
       socket.current.disconnect();
@@ -74,6 +69,7 @@ export default function PostCard() {
   }
 
   const posts = postsData?.pages?.flatMap((page) => page.posts) || [];
+
   return (
     <InfiniteScroll
       dataLength={posts?.length}
@@ -110,28 +106,72 @@ export default function PostCard() {
               </p>
             </div>
           </div>
+
           <p>{post.message}</p>
+
           {post.img && (
-            <img
+            <LikeImageWithEffect
               src={post.img}
-              alt="Post image"
-              className="mt-2 rounded-lg max-w-full"
+              postId={post._id}
+              onLike={handleLike}
+              isLiked={post.likes.includes(authData?.user?._id)}
             />
           )}
+
           <div className="flex items-center gap-10 mt-2.5">
             <Heart
               size={24}
-              className="cursor-pointer"
+              className="cursor-pointer transition-transform duration-200 active:scale-125"
               fill={post.likes.includes(authData?.user?._id) ? "red" : "none"}
               onClick={() => handleLike(post._id.toString())}
             />
             <MessageCircle size={24} />
           </div>
+
           <p className="text-gray-500 font-semibold">
             {post.likes?.length} {post.likes?.length <= 1 ? "like" : "likes"}
           </p>
         </div>
       ))}
     </InfiniteScroll>
+  );
+}
+
+function LikeImageWithEffect({ src, postId, isLiked, onLike }) {
+  const [showHeart, setShowHeart] = useState(false);
+
+  const handleDoubleClick = () => {
+    if (isLiked) return; 
+
+    setShowHeart(true);
+    onLike(postId.toString());
+    setTimeout(() => setShowHeart(false), 800);
+  };
+
+  return (
+    <div
+      className="relative mt-2 rounded-lg overflow-hidden"
+      onDoubleClick={handleDoubleClick}
+    >
+      <img
+        src={src}
+        alt="Post"
+        className="w-full h-full rounded-lg select-none cursor-pointer"
+      />
+      <AnimatePresence>
+        {showHeart && (
+          <motion.div
+            key="like"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1.2 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <Heart size={80} color="white" fill="red" className="drop-shadow-xl" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

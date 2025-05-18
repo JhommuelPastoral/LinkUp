@@ -46,7 +46,6 @@ export default function OnboradingPage() {
     e.preventDefault();
     onboardingMutation(onboardingData);
   };
-  const loading = true;
   return (
     <div className="bg-base-300 md:bg-base-100 max-w-[600px] min-h-screen mx-auto flex justify-center items-center font-Poppins">
       <div className="bg-base-300  p-6 md:p-10 rounded-lg items-center flex flex-col w-full">

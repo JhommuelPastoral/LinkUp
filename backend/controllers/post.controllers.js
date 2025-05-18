@@ -28,7 +28,7 @@ export const post = async (req,res,io) => {
 export const getPosts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; 
-    const limit = 1; 
+    const limit = 5; 
     const skip = (page - 1) * limit;
 
     const totalPosts = await Post.countDocuments();
@@ -51,7 +51,7 @@ export const getPosts = async (req, res) => {
 export const getAllUserPosts = async (req, res) => {
   try {
     const userId = req.user._id;
-    const posts = await Post.find({ userId: userId })
+    const posts = await Post.find({ userId: userId }).sort({ createdAt: -1 });
     res.status(200).json({ Allposts: posts });
   } catch (error) {
     console.log("getAllUserPosts error", error.message);
