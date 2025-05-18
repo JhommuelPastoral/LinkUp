@@ -7,29 +7,49 @@ import { io } from 'socket.io-client'
 import toast from 'react-hot-toast'
 import { useEffect, useRef , useState} from 'react'
 import { motion, AnimatePresence } from "framer-motion";
-
+import CommentModal from './CommentModal.jsx'
 dayjs.extend(relativeTime)
 
-export default function AllPost({posts, authData }) {
+export default function AllPost({ authData }) {
   const queryClient = useQueryClient();
   const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  // const{data:posts=[], refetch:postsRefetch} = useQuery({
-  //   queryKey: ["getAllUserPosts"],
-  //   queryFn: getAllUserPosts
-  // });
+  const dialogRef = useRef(null);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   const { mutate: likePost } = useMutation({
     mutationFn: addLike,
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries(["getAllUserPosts"]);
-      // postsRefetch();
     },
     onError: (error) => {
       toast.error(error.message);
     },
   });
 
+  const { data: getPost=[] } = useQuery({
+    queryKey: ["getAllUserPosts"],
+    queryFn: getAllUserPosts,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["getAllUserPosts"]);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  const openModal = (post) => {
+    setSelectedPost(post);
+    if (dialogRef.current) {
+      dialogRef.current.showModal();
+    }
+  };
+
+  const closeModal = () => {
+    if (dialogRef.current) {
+      dialogRef.current.close();
+    }
+    setSelectedPost(null);
+  };
   useEffect(() => {
     if(!authData) return;
     socket.current = io(backendUrl);
@@ -38,8 +58,13 @@ export default function AllPost({posts, authData }) {
       queryClient.invalidateQueries(["getAllUserPosts"]);
     });
 
+    socket.current.on("newComment", () => {
+      queryClient.invalidateQueries(["getAllUserPosts"]);
+    });
+
     return () => {
       socket.current.off("likePost");
+      socket.current.off("newComment");
     };
 
 
@@ -48,13 +73,14 @@ export default function AllPost({posts, authData }) {
   const handleLike = (id) => {
     likePost(id);
   };
+  const posts = getPost?.Allposts;
 
   return (
     <div className=" mt-5 max-w-[700px] mx-auto ">
       {posts?.Allposts?.length === 0 ? (
         <p className="text-center">No Post Available</p>
       ): (
-        posts?.Allposts?.map((post) => (
+        posts?.map((post) => (
         <div
           key={post._id}
           className="flex flex-col font-Poppins mb-4 lg:p-5 gap-2.5 border-b border-b-base-200"
@@ -98,15 +124,28 @@ export default function AllPost({posts, authData }) {
               fill={post.likes.includes(authData?._id) ? "red" : "none"}
               onClick={() => handleLike(post._id.toString())}
             />
-            <MessageCircle size={24} />
+            <MessageCircle size={24} onClick={() => openModal(post)} className="cursor-pointer"/>
           </div>
-          <p className="text-gray-500 font-semibold">
-            {post.likes?.length} {post.likes?.length <= 1 ? "like" : "likes"}
-          </p>
+          <div className='flex gap-5'>
+            <p className="text-gray-500 font-semibold">
+              {post.likes?.length} {post.likes?.length <= 1 ? "like" : "likes"}
+            </p>          
+            <p className="text-gray-500 font-semibold">
+              {post?.comments?.length} {post?.comments?.length <= 1 ? "comment" : "comments"}
+            </p>
+          </div>
+
         </div>
         ))
       )}
-
+      <dialog
+        className="modal"
+        ref={dialogRef}
+        onCancel={closeModal}  
+        onClick={(e) => {if (e.target === dialogRef.current) {closeModal();}}}
+      >
+        <CommentModal post={selectedPost} onClose={closeModal}  />
+      </dialog>
     </div>
   )
 }

@@ -17,6 +17,7 @@ export default function PostCard() {
   const socket = useRef(null);
   const [selectedPost, setSelectedPost] = useState(null);
   const dialogRef = useRef(null);
+  
   if (!authData) return <div className="w-full min-h-screen bg-base-200 skeleton" />;
 
 
@@ -64,14 +65,17 @@ export default function PostCard() {
     socket.current = io(backendUrl);
     socket.current.on("newPost", postsRefetch);
     socket.current.on("likePost", postsRefetch);
-    socket.current.on("userConnected", postsRefetch);
+    socket.current.on("user-connected", postsRefetch);
+    socket.current.on("newComment", postsRefetch);
     socket.current.on("user-disconnected", postsRefetch);
+
 
     return () => {
       socket.current.off("newPost");
       socket.current.off("likePost");
       socket.current.off("userConnected");
       socket.current.off("userDisconnected");
+      socket.current.off("newComment");
       socket.current.disconnect();
     };
   }, [postsData]);
@@ -81,7 +85,6 @@ export default function PostCard() {
   }
 
   const posts = postsData?.pages?.flatMap((page) => page.posts) || [];
-
   return (
     <InfiniteScroll
       dataLength={posts?.length}
@@ -131,18 +134,25 @@ export default function PostCard() {
           )}
 
           <div className="flex items-center gap-10 mt-2.5">
+            
             <Heart
               size={24}
               className="cursor-pointer transition-transform duration-200 active:scale-125"
               fill={post.likes.includes(authData?.user?._id) ? "red" : "none"}
               onClick={() => handleLike(post._id.toString())}
             />
-            <MessageCircle size={24} onClick={() => openModal(post)}/>
+            <MessageCircle size={24} onClick={() => openModal(post)} className="cursor-pointer"/>
+            <p></p>
           </div>
+          <div className="flex gap-5">
+            <p className="text-gray-500 font-semibold">
+              {post.likes?.length} {post.likes?.length <= 1 ? "like" : "likes"}
+            </p>
+            <p className="text-gray-500 font-semibold">
+              {post?.comments?.length} {post.comments?.length <= 1 ? "comment" : "comments"}
+            </p>
 
-          <p className="text-gray-500 font-semibold">
-            {post.likes?.length} {post.likes?.length <= 1 ? "like" : "likes"}
-          </p>
+          </div>
         </div>
       ))}
       <dialog

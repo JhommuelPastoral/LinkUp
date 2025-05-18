@@ -59,7 +59,7 @@ export default function CreatePost() {
     createPost(postData);
   }
   return (
-      <div className={`w-full gap-2.5 h-[110px] flex flex-col`}>
+      <div className={`w-full gap-2.5 max-h-[110px] flex flex-col`}>
         <div className={`flex gap-2.5 items-center ${!authData ? 'skeleton bg-base-200 rounded-full ' : ''}`}>
           <div className={`w-12 h-12 rounded-full `}>
             <img src={authData?.user?.profileImage} alt={authData?.user?.fullname} className={`w-12 h-12 rounded-full object-cover `} />
@@ -93,7 +93,7 @@ export default function CreatePost() {
               {/* Photo Preview Section */}
               {hasImage && (
                 <div className="relative mt-2.5 h-[500px] w-full">
-                  <img src={previewUrl} className='w-full h-full object-cover rounded-lg' />
+                  <img src={previewUrl} className='w-full h-full object-contain rounded-lg' />
                   <button
                     type="button"
                     onClick={handleClearImage}

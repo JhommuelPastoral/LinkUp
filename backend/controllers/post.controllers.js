@@ -35,6 +35,7 @@ export const getPosts = async (req, res) => {
 
     const posts = await Post.find({})
       .populate("userId", "fullname profileImage isOnline")
+      .populate("comments.userId", "fullname profileImage")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -51,7 +52,7 @@ export const getPosts = async (req, res) => {
 export const getAllUserPosts = async (req, res) => {
   try {
     const userId = req.user._id;
-    const posts = await Post.find({ userId: userId }).sort({ createdAt: -1 });
+    const posts = await Post.find({ userId: userId }).sort({ createdAt: -1 }).populate("userId", "fullname profileImage");
     res.status(200).json({ Allposts: posts });
   } catch (error) {
     console.log("getAllUserPosts error", error.message);
@@ -88,3 +89,30 @@ export const likePosts = async (req,res,io) => {
 
 }
 
+export const AddComment = async (req,res,io) => {
+  try {
+    const {userId, comment, postId} = req.body;
+    const post = await Post.findById(postId);
+    if(!post) {
+      return res.status(400).json({message: "Post not found"});
+    }
+    post.comments.push({userId, message: comment});
+    await post.save();
+    io.emit(`newComment`);
+    res.status(200).json({post, message: "Comment added successfully"});
+  } catch (error) {
+    console.log("AddComment error", error.message);
+    res.status(500).json({message: error.message});
+  }
+}
+
+export const getSpecificPosts = async (req, res) => {
+  try {
+    const {id:postId} = req.params
+    const posts = await Post.findById(postId).populate("comments.userId", "fullname profileImage");
+    res.status(200).json({ Allposts: posts });
+  } catch (error) {
+    console.log("getAllUserPosts error", error.message);
+    res.status(500).json({ message: error.message });
+  }
+}

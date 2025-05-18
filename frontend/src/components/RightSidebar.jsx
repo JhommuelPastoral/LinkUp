@@ -6,6 +6,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import {useLocation} from 'react-router'
 import toast from 'react-hot-toast';
 import { useState } from 'react';
+import { Link } from 'react-router';
 export default function RightSidebar() {
   const location = useLocation();
   const currectLocation = location.pathname;
@@ -110,7 +111,7 @@ export default function RightSidebar() {
         </div>
       </div>
       <p className='text-sm text-current/80'>Suggested for you</p>
-      {onlineUsers.length === 0 ? <p className='text-sm text-current/80 text-center'>No online users</p>:
+      {onlineUsers.length === 0 ?  <Link to="/explore/friends">  <p className='text-sm text-current/80 text-center'> No one is online <span className='link'>See more </span> </p> </Link>  :
         (
           filterRecommendAcc?.map((user) => (
             user?.isOnline && (          

@@ -134,14 +134,6 @@ export const post = async (data)=>{
   }
 }
 
-// export const getPosts = async ()=>{
-//   try {
-//     const response = await axiosInstance.get("/user/getposts");
-//     return response.data;
-//   } catch (error) {
-//     throw  Error(error.response?.data?.message );
-//   }
-// }
 
 export const getPosts = async ({ pageParam}) => {
   try {
@@ -172,12 +164,28 @@ export const addLike = async (id)=>{
   }
 }
 
-
+export const getSpecificPosts = async (id)=>{
+  try {
+    const response = await axiosInstance.get(`/user/getspecificpost/${id}`);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
 
 
 export const getAllUserPosts = async ()=>{
   try {
     const response = await axiosInstance.get(`/user/getuserposts`);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
+
+export const addComment = async (data)=>{
+  try {
+    const response = await axiosInstance.post(`/user/comment`,data);
     return response.data;
   } catch (error) {
     throw  Error(error.response?.data?.message );

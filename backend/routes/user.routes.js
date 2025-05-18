@@ -1,7 +1,7 @@
 import express from "express";
 import protectedRoute from "../middleware/auth.middleware.js";
 import { getRecommendedFriends,addFriend, getOnlineUsers, getPaginatedFriends, getOutgoingFriendRequests,getIncomingFriendRequests, getSingleRecommendeduser, acceptFriendRequest,getFriends } from "../controllers/user.controllers.js";
-import { post,getPosts, likePosts, getAllUserPosts} from "../controllers/post.controllers.js";
+import { post,getPosts, likePosts, getAllUserPosts, AddComment, getSpecificPosts} from "../controllers/post.controllers.js";
 const userRoutes =  (io) => {
   
   const router = express.Router();
@@ -18,9 +18,12 @@ const userRoutes =  (io) => {
 
   // Post
   router.post("/createpost",protectedRoute, (req, res) => post(req, res,io));
+  router.post("/comment",protectedRoute, (req, res) => AddComment(req, res,io));
   router.get("/getposts",protectedRoute, (req, res) => getPosts(req, res));
   router.post("/likepost/:id",protectedRoute, (req, res) => likePosts(req, res,io));
   router.get('/getuserposts',protectedRoute, (req, res) => getAllUserPosts(req, res));
+  router.get('/getspecificpost/:id',protectedRoute, (req, res) => getSpecificPosts(req, res));
+
   return router;
 
 }
