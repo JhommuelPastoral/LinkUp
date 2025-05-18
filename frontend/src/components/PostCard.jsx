@@ -7,24 +7,24 @@ import { Heart, MessageCircle, Clock } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import InfiniteScroll from "react-infinite-scroll-component";
-import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-
+import CommentModal from "./CommentModal.jsx";
 dayjs.extend(relativeTime);
 
 export default function PostCard() {
   const { authData } = useAuthUser();
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const socket = useRef(null);
-
+  const [selectedPost, setSelectedPost] = useState(null);
+  const dialogRef = useRef(null);
   if (!authData) return <div className="w-full min-h-screen bg-base-200 skeleton" />;
+
 
   const {
     data: postsData = [],
     fetchNextPage,
     hasNextPage,
     refetch: postsRefetch,
-    isFetchingNextPage
   } = useInfiniteQuery({
     queryKey: ["posts"],
     queryFn: ({ pageParam = 1 }) => getPosts({ pageParam }),
@@ -40,12 +40,24 @@ export default function PostCard() {
       postsRefetch();
     },
     onError: (error) => {
-      toast.error(error.message);
     },
   });
 
   const handleLike = (postId) => {
     likePost(postId);
+  };
+  const openModal = (post) => {
+    setSelectedPost(post);
+    if (dialogRef.current) {
+      dialogRef.current.showModal();
+    }
+  };
+
+  const closeModal = () => {
+    if (dialogRef.current) {
+      dialogRef.current.close();
+    }
+    setSelectedPost(null);
   };
 
   useEffect(() => {
@@ -64,7 +76,7 @@ export default function PostCard() {
     };
   }, [postsData]);
 
-  if (!authData?.user?._id || isFetchingNextPage) {
+  if (!authData?.user?._id) {
     return <div className="w-full min-h-screen bg-base-200 skeleton" />;
   }
 
@@ -125,7 +137,7 @@ export default function PostCard() {
               fill={post.likes.includes(authData?.user?._id) ? "red" : "none"}
               onClick={() => handleLike(post._id.toString())}
             />
-            <MessageCircle size={24} />
+            <MessageCircle size={24} onClick={() => openModal(post)}/>
           </div>
 
           <p className="text-gray-500 font-semibold">
@@ -133,6 +145,14 @@ export default function PostCard() {
           </p>
         </div>
       ))}
+      <dialog
+        className="modal"
+        ref={dialogRef}
+        onCancel={closeModal}  
+        onClick={(e) => {if (e.target === dialogRef.current) {closeModal();}}}
+      >
+        <CommentModal post={selectedPost} onClose={closeModal}  />
+      </dialog>
     </InfiniteScroll>
   );
 }

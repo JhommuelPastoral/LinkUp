@@ -22,7 +22,6 @@ export default function FriendRequestPage() {
 
   const allRequests = getIncomingFriend?.pages?.flatMap((page) => page.incomingFriendRequests || []
   );
-  console.log(allRequests);
   const{mutate: acceptFriendRequestMutation} = useMutation({
     mutationFn: acceptFriendRequest,
     onSuccess: () => {
@@ -61,7 +60,7 @@ export default function FriendRequestPage() {
   return (
     <div className="flex flex-col p-5  max-w-[600px] mx-auto font-Poppins gap-5" >
         <p className="text-sm  ">Suggested Friends</p>
-        {allRequests?.length === 0 && <p className="text-lg font-semibold">No Friend Requests</p>}
+        {allRequests?.length === 0 && <p className="text-sm text-center font-semibold">No Friend Requests</p>}
 
         {allRequests?.map((acc,index) => (
           <div className="flex justify-between items-center" key={index}>
@@ -82,13 +81,13 @@ export default function FriendRequestPage() {
           </div>
           
         ))}
-        {hasNextPage ? (
+        {hasNextPage && (
         <button
           className="btn btn-primary mt-4 self-center"
           onClick={() => fetchNextPage()}
         >
           View More
-        </button>):( <p className="text-lg font-semibold text-center">No more Friend Requests</p>)
+        </button>)
       }    
     </div>
   )
