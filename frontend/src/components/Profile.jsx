@@ -8,6 +8,7 @@ import AllPost from "./AllPost.jsx";
 export default function Profile({authData}) {
   const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [allLikesUser, setAllLikes] = useState([]);
   const [value, setValue] = useState({
     totalPosts: 0,
     totalLikes: 0,
@@ -20,7 +21,16 @@ export default function Profile({authData}) {
   });
 
   useEffect(() => {
+    if (!posts?.Allposts || !authData?.user?._id) return;
 
+    const allLike = posts.Allposts.filter((post) =>
+      post?.likes?.includes(authData.user._id)
+    );
+
+    setAllLikes(allLike); 
+  }, [posts, authData?.user?._id]);
+
+  useEffect(() => {
     socket.current = io(backendUrl);
     socket.current.on(`newPost${authData?.user?._id}`, () => {
       postsRefetch();
@@ -33,7 +43,7 @@ export default function Profile({authData}) {
       },
     });
 
-    const likesControl = animate(0, 100000, {
+    const likesControl = animate(0, allLikesUser?.length, {
       duration: 2,
       onUpdate(value) {
         setValue((prev) => ({ ...prev, totalLikes: value.toFixed(0) }));
@@ -46,12 +56,13 @@ export default function Profile({authData}) {
         setValue((prev) => ({ ...prev, totalFriends: value.toFixed(0) }));
       },
     });
+
     return () => {
       postsControl.stop();
       likesControl.stop();
       friendsControl.stop();
     }
-  }, [posts]);
+  }, [posts,allLikesUser]);
 
   return (
     <>

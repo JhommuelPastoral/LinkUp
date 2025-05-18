@@ -18,30 +18,6 @@ export const getRecommendedFriends = async (req,res) => {
   }
 }
 
-// export const getSingleRecommendeduser = async (req,res) => {
-//   try {
-//     const page = req.query.page;
-//     const limit = 5;
-//     const skip = (page - 1) * limit;
-//     const currentUserId = req.user._id;
-//     const currentUser = await User.findById(currentUserId);
-
-//     const recommendUser = await User.find({
-//       $and:[
-//         {_id: {$ne: currentUserId}},
-//         {_id: {$nin: currentUser.friends}},
-//         {isOnboarded: true}
-//       ]
-//     }).select('-password').skip(skip).limit(limit);
-
-
-//     const hasMore = page * limit < recommendUser.length;
-//     return res.status(200).json({ hasMore, recommendUser});
-
-//   } catch (error) {
-//     console.log("getIncomingFriendRequests", error.message);
-//   }
-// }
 
 export const getSingleRecommendeduser = async (req,res) => {
   try {
@@ -76,8 +52,32 @@ export const getFriends = async (req,res) => {
   } catch (error) {
     console.log("getFriends", error.message); 
   }
-
 } 
+
+export const getPaginatedFriends = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    const user = await User.findById(req.user._id).select("friends").populate('friends', "fullname profileImage");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const totalFriends = user.friends.length;
+    const paginatedFriends = user.friends.slice(skip, skip + limit);
+
+    const hasMore = skip + limit < totalFriends;
+
+    res.status(200).json({ hasMore, friends: paginatedFriends });
+  } catch (error) {
+    console.log("getFriends", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 export const addFriend = async (req,res, io) => {
   try {
@@ -155,10 +155,18 @@ export const getOutgoingFriendRequests = async (req,res,io) => {
   }
 }
 
+
 export const getIncomingFriendRequests = async (req,res) => {
   try {
-    const incomingFriendRequests = await FriendRequest.find({reciptient: req.user._id, status: "pending"}).populate("sender", "fullname profileImage bio");
-    res.status(200).json({incomingFriendRequests});
+    const page = req.query.page;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    const totalIncomingFriendRequests = await FriendRequest.countDocuments({reciptient: req.user._id, status: "pending"});
+    const incomingFriendRequests = await FriendRequest.find({reciptient: req.user._id,status: "pending",}).populate("sender", "fullname profileImage bio").skip(skip).limit(limit);
+    const hasMore = page * limit < totalIncomingFriendRequests.length;
+
+    res.status(200).json({hasMore, incomingFriendRequests});
   } catch (error) {
     console.log("getIncomingFriendRequests", error.message);
   }

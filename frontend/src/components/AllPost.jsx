@@ -5,7 +5,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { addLike, getAllUserPosts } from '../lib/api.js'
 import { io } from 'socket.io-client'
 import toast from 'react-hot-toast'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef , useState} from 'react'
+import { motion, AnimatePresence } from "framer-motion";
+
 dayjs.extend(relativeTime)
 
 export default function AllPost({posts, authData }) {
@@ -20,7 +22,6 @@ export default function AllPost({posts, authData }) {
   const { mutate: likePost } = useMutation({
     mutationFn: addLike,
     onSuccess: (data) => {
-      toast.success(data.message);
       queryClient.invalidateQueries(["getAllUserPosts"]);
       // postsRefetch();
     },
@@ -83,10 +84,11 @@ export default function AllPost({posts, authData }) {
           </div>
           <p>{post.message}</p>
           {post.img && (
-            <img
+            <LikeImageWithEffect
               src={post.img}
-              alt="Post image"
-              className="mt-2 rounded-lg max-w-full"
+              postId={post._id}
+              onLike={handleLike}
+              isLiked={post.likes.includes(authData?._id)}
             />
           )}
           <div className="flex items-center gap-10 mt-2.5">
@@ -107,4 +109,42 @@ export default function AllPost({posts, authData }) {
 
     </div>
   )
+}
+function LikeImageWithEffect({ src, postId, isLiked, onLike }) {
+  const [showHeart, setShowHeart] = useState(false);
+
+  const handleDoubleClick = () => {
+    if (isLiked) return; 
+
+    setShowHeart(true);
+    onLike(postId.toString());
+    setTimeout(() => setShowHeart(false), 800);
+  };
+
+  return (
+    <div
+      className="relative mt-2 rounded-lg overflow-hidden"
+      onDoubleClick={handleDoubleClick}
+    >
+      <img
+        src={src}
+        alt="Post"
+        className="w-full h-full rounded-lg select-none cursor-pointer"
+      />
+      <AnimatePresence>
+        {showHeart && (
+          <motion.div
+            key="like"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1.2 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <Heart size={80} color="white" fill="red" className="drop-shadow-xl" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }

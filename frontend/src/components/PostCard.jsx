@@ -24,6 +24,7 @@ export default function PostCard() {
     fetchNextPage,
     hasNextPage,
     refetch: postsRefetch,
+    isFetchingNextPage
   } = useInfiniteQuery({
     queryKey: ["posts"],
     queryFn: ({ pageParam = 1 }) => getPosts({ pageParam }),
@@ -36,7 +37,6 @@ export default function PostCard() {
   const { mutate: likePost } = useMutation({
     mutationFn: addLike,
     onSuccess: (data) => {
-      toast.success(data.message);
       postsRefetch();
     },
     onError: (error) => {
@@ -64,7 +64,7 @@ export default function PostCard() {
     };
   }, [postsData]);
 
-  if (!authData?.user?._id) {
+  if (!authData?.user?._id || isFetchingNextPage) {
     return <div className="w-full min-h-screen bg-base-200 skeleton" />;
   }
 

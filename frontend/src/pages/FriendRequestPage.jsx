@@ -1,7 +1,7 @@
 import useAuthUser  from '../hooks/useAuthUser.js';
 import {io} from 'socket.io-client';
 import { getIncomingFriendRequests , acceptFriendRequest} from '../lib/api.js';
-import {useQuery, useMutation} from '@tanstack/react-query';
+import {useMutation, useInfiniteQuery} from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 export default function FriendRequestPage() {
@@ -9,11 +9,20 @@ export default function FriendRequestPage() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { authData } = useAuthUser();
 
-  const{data: getIncomingFriend=[], refetch: incomingFriendRequestsRefetch} = useQuery({
-    queryKey: ['incomingFriendRequests'],
-    queryFn: getIncomingFriendRequests
-  });
+  const{
+    data: getIncomingFriend=[],
+    refetch: incomingFriendRequestsRefetch,
+    hasNextPage,
+    fetchNextPage
+    }= useInfiniteQuery({
+    queryKey: ['incomingFriendRequests/page'],
+    queryFn:({pageParam=1})=>getIncomingFriendRequests({pageParam}),
+    getNextPageParam:(lastPage,allPages)=> lastPage?.hasMore ? allPages?.length+1 : undefined
+  })
 
+  const allRequests = getIncomingFriend?.pages?.flatMap((page) => page.incomingFriendRequests || []
+  );
+  console.log(allRequests);
   const{mutate: acceptFriendRequestMutation} = useMutation({
     mutationFn: acceptFriendRequest,
     onSuccess: () => {
@@ -38,6 +47,7 @@ export default function FriendRequestPage() {
 
     return () => {
       socket.current.off(`incomingFriendRequests${authData?.user?._id}`);
+      socket.current.off(`acceptedFriendRequest${authData?.user?._id}`);
       socket.current.disconnect();
     };
 
@@ -51,9 +61,9 @@ export default function FriendRequestPage() {
   return (
     <div className="flex flex-col p-5  max-w-[600px] mx-auto font-Poppins gap-5" >
         <p className="text-sm  ">Suggested Friends</p>
-        {getIncomingFriend?.incomingFriendRequests?.length === 0 && <p className="text-lg font-semibold">No Friend Requests</p>}
+        {allRequests?.length === 0 && <p className="text-lg font-semibold">No Friend Requests</p>}
 
-        {getIncomingFriend?.incomingFriendRequests?.map((acc,index) => (
+        {allRequests?.map((acc,index) => (
           <div className="flex justify-between items-center" key={index}>
             <div className="flex gap-2.5 items-center ">
               <div className="w-12 h-12 rounded-full">
@@ -72,6 +82,14 @@ export default function FriendRequestPage() {
           </div>
           
         ))}
+        {hasNextPage ? (
+        <button
+          className="btn btn-primary mt-4 self-center"
+          onClick={() => fetchNextPage()}
+        >
+          View More
+        </button>):( <p className="text-lg font-semibold text-center">No more Friend Requests</p>)
+      }    
     </div>
   )
 }

@@ -69,6 +69,15 @@ export const getOnlineUsers = async ()=>{
   }
 }
 
+export const getPaginatedFriends = async ({pageParam})=>{
+  try {
+    const response = await axiosInstance.get(`/user/getPaginatedFriends?page=${pageParam}`);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
+
 export const addFriend = async (id)=>{
   try {
     const response = await axiosInstance.post(`/user/addfriend/${id}`);
@@ -89,9 +98,9 @@ export const getOutgoingFriendRequests = async ()=>{
 }
 
 
-export const getIncomingFriendRequests = async ()=>{
+export const getIncomingFriendRequests = async ({pageParam})=>{
   try {
-    const response = await axiosInstance.get("/user/getIncomingFriendRequests");
+    const response = await axiosInstance.get(`/user/getIncomingFriendRequests?page=${pageParam}`);
     return response.data;
   } catch (error) {
     throw  Error(error.response?.data?.message );

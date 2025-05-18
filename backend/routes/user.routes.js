@@ -1,6 +1,6 @@
 import express from "express";
 import protectedRoute from "../middleware/auth.middleware.js";
-import { getRecommendedFriends,addFriend, getOnlineUsers, getOutgoingFriendRequests,getIncomingFriendRequests, getSingleRecommendeduser, acceptFriendRequest,getFriends } from "../controllers/user.controllers.js";
+import { getRecommendedFriends,addFriend, getOnlineUsers, getPaginatedFriends, getOutgoingFriendRequests,getIncomingFriendRequests, getSingleRecommendeduser, acceptFriendRequest,getFriends } from "../controllers/user.controllers.js";
 import { post,getPosts, likePosts, getAllUserPosts} from "../controllers/post.controllers.js";
 const userRoutes =  (io) => {
   
@@ -11,6 +11,7 @@ const userRoutes =  (io) => {
   router.post("/addfriend/:id",protectedRoute, (req, res) => addFriend(req, res,io));
   router.post("/acceptfriendrequest/:id",protectedRoute, (req, res) => acceptFriendRequest(req, res,io));
   router.get("/getfriends",protectedRoute, (req, res) => getFriends(req, res));
+  router.get("/getPaginatedFriends",protectedRoute, (req, res) => getPaginatedFriends(req, res));
   router.get("/getonline",protectedRoute, (req, res) => getOnlineUsers(req, res, io));
   router.get("/getOutgoingFriendRequests",protectedRoute, (req, res) => getOutgoingFriendRequests(req, res, io ));
   router.get("/getIncomingFriendRequests",protectedRoute, (req, res) => getIncomingFriendRequests(req, res, io));
