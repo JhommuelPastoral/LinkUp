@@ -83,9 +83,9 @@ export default function SideBar() {
     setFilterRecommendAcc(filterAcc);
     
     setBadgeCounts({
-      'Friend Requests': incomingFriendRequests?.length,
-      'Suggested Friends': filterAcc?.length,
-      'Friends': userFriends?.friends?.friends?.length
+      'Friend Requests': incomingFriendRequests?.length || 0,
+      'Suggested Friends': filterAcc?.length || 0,
+      'Friends': userFriends?.friends?.friends?.length || 0
     })
     return () => {
       socket.current.off(`outgoingFriendRequests${authData?.user?._id.toString()}`);

@@ -15,21 +15,20 @@ export default function PostCard() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const socket = useRef(null);
 
+  if(!authData) return <div className="w-full min-h-screen bg-base-200 skeleton" />
+
   const {
-    data: postsData = [],
+    data: postsData=[],
     fetchNextPage,
     hasNextPage,
     refetch: postsRefetch,
   } = useInfiniteQuery({
     queryKey: ["posts"],
-    queryFn: ({ pageParam = 1 }) =>  getPosts({ pageParam }),
+    queryFn: ({ pageParam = 1 }) => getPosts({ pageParam }),
     getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage || typeof lastPage.hasMore === 'undefined') {
-        return undefined;
-      }
-      return lastPage.hasMore ? allPages.length + 1 : undefined;
+      return lastPage?.hasMore ? allPages?.length + 1 : undefined;
     },
-    initialPageParam: 1,
+    enabled: !!authData?.user?._id,
   });
 
   const { mutate: likePost } = useMutation({
@@ -54,7 +53,7 @@ export default function PostCard() {
     });
     socket.current.on("likePost", () => {
       postsRefetch();
-    });
+    })
     socket.current.on("userConnected", () => {
       postsRefetch();
     });
@@ -64,22 +63,20 @@ export default function PostCard() {
 
     return () => {
       socket.current.off("newPost");
-      socket.current.off("likePost");
       socket.current.off("userConnected");
-      socket.current.off("user-disconnected");
+      socket.current.off("userDisconnected");
       socket.current.disconnect();
     };
-  }, [postsRefetch]);
+  }, [postsData]);
 
   if (!authData?.user?._id) {
     return <div className="w-full min-h-screen bg-base-200 skeleton" />;
   }
 
   const posts = postsData?.pages?.flatMap((page) => page.posts) || [];
-
   return (
     <InfiniteScroll
-      dataLength={posts.length}
+      dataLength={posts?.length}
       next={fetchNextPage}
       hasMore={!!hasNextPage}
       loader={<h4>Loading...</h4>}
@@ -125,7 +122,7 @@ export default function PostCard() {
             <Heart
               size={24}
               className="cursor-pointer"
-              fill={post.likes.includes(authData.user._id) ? "red" : "none"}
+              fill={post.likes.includes(authData?.user?._id) ? "red" : "none"}
               onClick={() => handleLike(post._id.toString())}
             />
             <MessageCircle size={24} />

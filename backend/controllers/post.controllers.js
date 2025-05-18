@@ -28,7 +28,7 @@ export const post = async (req,res,io) => {
 export const getPosts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; 
-    const limit = 5; 
+    const limit = 1; 
     const skip = (page - 1) * limit;
 
     const totalPosts = await Post.countDocuments();

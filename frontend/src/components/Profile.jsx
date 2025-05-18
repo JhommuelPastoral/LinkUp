@@ -14,7 +14,7 @@ export default function Profile({authData}) {
   });
 
   const{data:posts=[], refetch:postsRefetch} = useQuery({
-    queryKey: ["posts"],
+    queryKey: ["getAllUserPosts"],
     queryFn: getAllUserPosts
   });
 

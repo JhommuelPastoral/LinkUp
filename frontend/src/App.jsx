@@ -16,6 +16,8 @@ import { Toaster } from 'react-hot-toast';
 import { Navigate } from 'react-router';
 import { useThemeStore } from './store/useThemeStore.js';
 
+
+
 export default function App() {
   const {isLoading, isError, authData} = useAuthUser();
   const {theme} = useThemeStore();

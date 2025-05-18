@@ -1,7 +1,7 @@
 import PostCard from '../components/PostCard.jsx';
+import useAuthUser from '../hooks/useAuthUser.js';
 import CreatePost from '../components/CreatePost.jsx';
 export default function HomePage() {
-
 
   return (
     <div className='max-w-[800px] mx-auto min-h-screen space-y-5 p-5 font-Poppins'>

@@ -1,100 +1,139 @@
-import { useInfiniteQuery, useQuery, useMutation  } from "@tanstack/react-query"
-import { getSingleRecommendeduser, getOutgoingFriendRequests ,getIncomingFriendRequests, addFriend } from "../lib/api.js"
-import { useEffect, useRef, useState } from "react";
-import {io} from 'socket.io-client';
-import useAuthUser  from "../hooks/useAuthUser.js";
-import toast from 'react-hot-toast';
+import useAuthUser from "../hooks/useAuthUser.js";
+import { useEffect, useRef } from "react";
+import { getPosts, addLike } from "../lib/api.js";
+import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
+import { io } from "socket.io-client";
+import { Heart, MessageCircle, Clock } from "lucide-react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import InfiniteScroll from "react-infinite-scroll-component";
+import toast from "react-hot-toast";
+dayjs.extend(relativeTime);
 
-export default function Test() {
+export default function PostCard() {
   const { authData } = useAuthUser();
-  const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const [filterRecommendAcc, setFilterRecommendAcc] = useState([]);
+  const socket = useRef(null);
 
-  const{
-    data:recommended,
-    hasNextPage,
+  if(!authData) return <div className="w-full min-h-screen bg-base-200 skeleton" />
+
+  const {
+    data: postsData=[],
     fetchNextPage,
-    refetch:refetchRecommended
-  }= useInfiniteQuery(
-    {
-      queryKey:["recommended"],
-      queryFn:({pageParam=1})=>getSingleRecommendeduser({pageParam}),
-
-      getNextPageParam:(lastPage,allPages)=>{
-        return lastPage?.hasMore ? allPages.length+1 : undefined;
-      }
-
-    }
-  );
-
-  const {data: getOutgoingFriend=[], refetch: outGoingFriendRequestsRefetch} = useQuery({
-    queryKey: ['outgoingFriendRequests'],
-    queryFn: getOutgoingFriendRequests
+    hasNextPage,
+    refetch: postsRefetch,
+  } = useInfiniteQuery({
+    queryKey: ["posts"],
+    queryFn: ({ pageParam = 1 }) => getPosts({ pageParam }),
+    getNextPageParam: (lastPage, allPages) => {
+      console.log(allPages);
+      return lastPage?.hasMore ? allPages?.length + 1 : undefined;
+    },
+    enabled: !!authData?.user?._id,
   });
 
-  const {data: getIncomingFriend=[], refetch: incomingFriendRequestsRefetch} = useQuery({
-    queryKey: ['incomingFriendRequests'],
-    queryFn: getIncomingFriendRequests
-  });
-
-  const {mutate: handleAddFriendMutation} = useMutation({
-    mutationFn: addFriend,
-    onSuccess: () => {
-      toast.success('Friend request sent successfully!');
+  const { mutate: likePost } = useMutation({
+    mutationFn: addLike,
+    onSuccess: (data) => {
+      toast.success(data.message);
+      postsRefetch();
     },
     onError: (error) => {
-      toast.error(error)
+      toast.error(error.message);
     },
   });
 
+  const handleLike = (postId) => {
+    likePost(postId);
+  };
 
-  useEffect(()=>{
-    if(!authData?.user?._id) return;
+  useEffect(() => {
     socket.current = io(backendUrl);
-    socket.current.on(`outgoingFriendRequests${authData?.user?._id.toString()}`, () => {
-      outGoingFriendRequestsRefetch();
+    socket.current.on("newPost", () => {
+      postsRefetch();
+    });
+    socket.current.on("likePost", () => {
+      postsRefetch();
+    })
+    socket.current.on("userConnected", () => {
+      postsRefetch();
+    });
+    socket.current.on("user-disconnected", () => {
+      postsRefetch();
     });
 
-    socket.current.on(`incomingFriendRequests${authData?.user?._id.toString()}`, () => {
-      incomingFriendRequestsRefetch();
-    });
-    const outgoingFriendRequests = getOutgoingFriend?.outgoingFriendRequests?.map((req) => req.reciptient?._id);
-    const incomingFriendRequests = getIncomingFriend?.incomingFriendRequests?.map((req) => req.sender?._id);
-    const flatRecommended = recommended?.pages?.flatMap((page) => page.recommendUser);
-    const filtered = flatRecommended?.filter((acc) => !outgoingFriendRequests?.includes(acc?._id) && !incomingFriendRequests?.includes(acc?._id));
-    setFilterRecommendAcc(filtered);
-    
-  },[recommended, getOutgoingFriend, getIncomingFriend])
+    return () => {
+      socket.current.off("newPost");
+      socket.current.off("userConnected");
+      socket.current.off("userDisconnected");
+      socket.current.disconnect();
+    };
+  }, [postsData]);
 
-  const handleAddFriend = async (userId) => {
-    handleAddFriendMutation(userId);
+  if (!authData?.user?._id) {
+    return <div className="w-full min-h-screen bg-base-200 skeleton" />;
   }
-  return (
-    <div className="flex flex-col p-5  max-w-[600px] mx-auto font-Poppins gap-5" >
-        <p className="text-sm  ">Suggested Friends</p>
-        {filterRecommendAcc?.length === 0 && <p className="text-sm  ">No Friends</p>}
-        {filterRecommendAcc?.map((acc,index) => (
-          <div className="flex justify-between items-center" key={index}>
-            <div className="flex gap-2.5 items-center ">
-              <div className="w-12 h-12 rounded-full">
-                <img
-                  src={acc?.profileImage}
-                  alt={acc?.fullname}
-                  className="w-12 h-12 object-cover object-center rounded-full"
-                />
-              </div>
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold">{acc?.fullname}</p>
-                <p className="text-xs">asd</p>
-              </div>
-            </div>
-            <button className="btn btn-sm" onClick={() => handleAddFriend(acc?._id)}> Send Request</button>
-          </div>
-          
-        ))}
-        {hasNextPage && <button onClick={() => fetchNextPage()}>Load more</button>}
 
-    </div>
-  )
+  const posts = postsData?.pages?.flatMap((page) => page.posts) || [];
+  console.log(posts);
+  return (
+    <InfiniteScroll
+      dataLength={posts?.length}
+      next={fetchNextPage}
+      hasMore={!!hasNextPage}
+      loader={<h4>Loading...</h4>}
+      endMessage={<p className="text-center">No more posts</p>}
+    >
+      {posts.map((post) => (
+        <div
+          key={post._id}
+          className="flex flex-col font-Poppins mb-4 lg:p-5 gap-2.5 border-b border-b-base-200"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-12 h-12 rounded-full">
+              <img
+                className="w-12 h-12 rounded-full object-cover"
+                src={post.userId.profileImage}
+                alt={post.userId.fullname}
+              />
+            </div>
+            <div className="flex flex-col">
+              <p className="font-semibold flex gap-2.5 items-center">
+                {post.userId.fullname}
+                {post.userId.isOnline && (
+                  <span
+                    aria-label="success"
+                    className="status status-success rounded-full"
+                  ></span>
+                )}
+              </p>
+              <p className="text-gray-500 text-sm flex items-center gap-2.5">
+                <Clock size={16} /> {dayjs(post.createdAt).fromNow()}
+              </p>
+            </div>
+          </div>
+          <p>{post.message}</p>
+          {post.img && (
+            <img
+              src={post.img}
+              alt="Post image"
+              className="mt-2 rounded-lg max-w-full"
+            />
+          )}
+          <div className="flex items-center gap-10 mt-2.5">
+            <Heart
+              size={24}
+              className="cursor-pointer"
+              fill={post.likes.includes(authData?.user?._id) ? "red" : "none"}
+              onClick={() => handleLike(post._id.toString())}
+            />
+            <MessageCircle size={24} />
+          </div>
+          <p className="text-gray-500 font-semibold">
+            {post.likes?.length} {post.likes?.length <= 1 ? "like" : "likes"}
+          </p>
+        </div>
+      ))}
+    </InfiniteScroll>
+  );
 }
