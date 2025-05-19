@@ -65,7 +65,7 @@ export default function SuggestedFriends() {
     const filtered = flatRecommended?.filter((acc) => !outgoingFriendRequests?.includes(acc?._id) && !incomingFriendRequests?.includes(acc?._id)) || [];
     setFilterRecommendAcc(filtered);
     
-  },[recommended, getOutgoingFriend, getIncomingFriend])
+  },[authData])
 
   const handleAddFriend = async (userId) => {
     handleAddFriendMutation(userId);

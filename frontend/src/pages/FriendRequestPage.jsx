@@ -50,7 +50,7 @@ export default function FriendRequestPage() {
       socket.current.disconnect();
     };
 
-  }, [getIncomingFriend]);
+  }, [authData]);
 
   const handleAccceptFriend = (id) => {
     acceptFriendRequestMutation(id);

@@ -93,7 +93,7 @@ export default function RightSidebar() {
         Socket.current.disconnect();
       }
     };
-  }, [getOutgoingFriend, getIncomingFriend, recommendAcc]);
+  }, [authData]);
 
 
   const handleAddFriend = (userId) => {

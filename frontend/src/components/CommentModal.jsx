@@ -62,7 +62,7 @@ export default function CommentModal({ post, onClose }) {
       socket.current.off(`newComment${post._id}` );
       socket.current.disconnect();
     };
-  }, [post, refetchComments]);
+  }, [post]);
 
   const handleSubmit = () => {
     if (
