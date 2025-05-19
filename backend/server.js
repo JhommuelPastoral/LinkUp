@@ -11,7 +11,8 @@ import User from './models/User.js';
 
 const app = express();
 dotenv.config();
-
+// https://linkup-ub4p.onrender.com/
+// http://localhost:5173
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {

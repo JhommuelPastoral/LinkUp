@@ -98,6 +98,7 @@ export const AddComment = async (req,res,io) => {
     }
     post.comments.push({userId, message: comment});
     await post.save();
+    io.emit(`newComment${postId}`);
     io.emit(`newComment`);
     res.status(200).json({post, message: "Comment added successfully"});
   } catch (error) {

@@ -1,7 +1,7 @@
 import useAuthUser from "../hooks/useAuthUser.js";
 import { useEffect, useRef, useState } from "react";
 import { getPosts, addLike } from "../lib/api.js";
-import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
+import { useMutation, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { io } from "socket.io-client";
 import { Heart, MessageCircle, Clock } from "lucide-react";
 import dayjs from "dayjs";
@@ -17,15 +17,12 @@ export default function PostCard() {
   const socket = useRef(null);
   const [selectedPost, setSelectedPost] = useState(null);
   const dialogRef = useRef(null);
-  
-  if (!authData) return <div className="w-full min-h-screen bg-base-200 skeleton" />;
-
+  const queryClient = useQueryClient();
 
   const {
     data: postsData = [],
     fetchNextPage,
     hasNextPage,
-    refetch: postsRefetch,
   } = useInfiniteQuery({
     queryKey: ["posts"],
     queryFn: ({ pageParam = 1 }) => getPosts({ pageParam }),
@@ -37,57 +34,57 @@ export default function PostCard() {
 
   const { mutate: likePost } = useMutation({
     mutationFn: addLike,
-    onSuccess: (data) => {
-      postsRefetch();
-    },
-    onError: (error) => {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
 
   const handleLike = (postId) => {
     likePost(postId);
   };
+
   const openModal = (post) => {
     setSelectedPost(post);
-    if (dialogRef.current) {
-      dialogRef.current.showModal();
-    }
+    dialogRef.current?.showModal();
   };
 
   const closeModal = () => {
-    if (dialogRef.current) {
-      dialogRef.current.close();
-    }
+    dialogRef.current?.close();
     setSelectedPost(null);
   };
 
   useEffect(() => {
     socket.current = io(backendUrl);
-    socket.current.on("newPost", postsRefetch);
-    socket.current.on("likePost", postsRefetch);
-    socket.current.on("user-connected", postsRefetch);
-    socket.current.on("newComment", postsRefetch);
-    socket.current.on("user-disconnected", postsRefetch);
 
+    const invalidatePosts = () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    };
+
+    socket.current.on("newPost", invalidatePosts);
+    socket.current.on("likePost", invalidatePosts);
+    socket.current.on("newComment", invalidatePosts);
+    socket.current.on("user-connected", invalidatePosts);
+    socket.current.on("user-disconnected", invalidatePosts);
 
     return () => {
-      socket.current.off("newPost");
-      socket.current.off("likePost");
-      socket.current.off("userConnected");
-      socket.current.off("userDisconnected");
-      socket.current.off("newComment");
+      socket.current.off("newPost", invalidatePosts);
+      socket.current.off("likePost", invalidatePosts);
+      socket.current.off("newComment", invalidatePosts);
+      socket.current.off("user-connected", invalidatePosts);
+      socket.current.off("user-disconnected", invalidatePosts);
       socket.current.disconnect();
     };
-  }, [postsData]);
+  }, [queryClient]);
 
   if (!authData?.user?._id) {
     return <div className="w-full min-h-screen bg-base-200 skeleton" />;
   }
 
   const posts = postsData?.pages?.flatMap((page) => page.posts) || [];
+
   return (
     <InfiniteScroll
-      dataLength={posts?.length}
+      dataLength={posts.length}
       next={fetchNextPage}
       hasMore={!!hasNextPage}
       loader={<h4>Loading...</h4>}
@@ -110,10 +107,7 @@ export default function PostCard() {
               <p className="font-semibold flex gap-2.5 items-center">
                 {post.userId.fullname}
                 {post.userId.isOnline && (
-                  <span
-                    aria-label="success"
-                    className="status status-success rounded-full"
-                  ></span>
+                  <span className="status status-success rounded-full" />
                 )}
               </p>
               <p className="text-gray-500 text-sm flex items-center gap-2.5">
@@ -129,39 +123,42 @@ export default function PostCard() {
               src={post.img}
               postId={post._id}
               onLike={handleLike}
-              isLiked={post.likes.includes(authData?.user?._id)}
+              isLiked={post.likes.includes(authData.user._id)}
             />
           )}
 
           <div className="flex items-center gap-10 mt-2.5">
-            
             <Heart
               size={24}
               className="cursor-pointer transition-transform duration-200 active:scale-125"
-              fill={post.likes.includes(authData?.user?._id) ? "red" : "none"}
-              onClick={() => handleLike(post._id.toString())}
+              fill={post.likes.includes(authData.user._id) ? "red" : "none"}
+              onClick={() => handleLike(post._id)}
             />
-            <MessageCircle size={24} onClick={() => openModal(post)} className="cursor-pointer"/>
-            <p></p>
+            <MessageCircle size={24} onClick={() => openModal(post)} className="cursor-pointer" />
           </div>
+
           <div className="flex gap-5">
             <p className="text-gray-500 font-semibold">
-              {post.likes?.length} {post.likes?.length <= 1 ? "like" : "likes"}
+              {post.likes.length} {post.likes.length === 1 ? "like" : "likes"}
             </p>
             <p className="text-gray-500 font-semibold">
-              {post?.comments?.length} {post.comments?.length <= 1 ? "comment" : "comments"}
+              {post.comments.length} {post.comments.length === 1 ? "comment" : "comments"}
             </p>
-
           </div>
         </div>
       ))}
+
       <dialog
         className="modal"
         ref={dialogRef}
-        onCancel={closeModal}  
-        onClick={(e) => {if (e.target === dialogRef.current) {closeModal();}}}
+        onCancel={closeModal}
+        onClick={(e) => {
+          if (e.target === dialogRef.current) {
+            closeModal();
+          }
+        }}
       >
-        <CommentModal post={selectedPost} onClose={closeModal}  />
+        <CommentModal post={selectedPost} onClose={closeModal} />
       </dialog>
     </InfiniteScroll>
   );
@@ -171,10 +168,10 @@ function LikeImageWithEffect({ src, postId, isLiked, onLike }) {
   const [showHeart, setShowHeart] = useState(false);
 
   const handleDoubleClick = () => {
-    if (isLiked) return; 
+    if (isLiked) return;
 
     setShowHeart(true);
-    onLike(postId.toString());
+    onLike(postId);
     setTimeout(() => setShowHeart(false), 800);
   };
 
