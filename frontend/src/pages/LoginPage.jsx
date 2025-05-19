@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 
 export default function LoginPage() {
   const socketRef = useRef(null);
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   const [siginData, setSiginData] = useState({
     email: "",
     password: "",
@@ -31,18 +31,18 @@ export default function LoginPage() {
     },
   });
 
-  // useEffect(() => {
-  //   socketRef.current = io(backendUrl);
+  useEffect(() => {
+    socketRef.current = io("http://localhost:5001");
 
-  //   socketRef.current.on("recommendUser", () => {
-  //     console.log("Socket event: recommendUser");
-  //     refetch(); 
-  //   });
+    socketRef.current.on("recommendUser", () => {
+      console.log("Socket event: recommendUser");
+      refetch(); 
+    });
 
-  //   return () => {
-  //     socketRef.current.disconnect();
-  //   };
-  // }, []);
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, [refetch]);
 
 
   const handleSubmit = (e) => {

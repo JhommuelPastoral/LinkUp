@@ -65,11 +65,10 @@ export default function AllPost({ authData }) {
     return () => {
       socket.current.off("likePost");
       socket.current.off("newComment");
-      socket.current.disconnect();
     };
 
 
-  }, [authData]);
+  }, []);
 
   const handleLike = (id) => {
     likePost(id);

@@ -37,7 +37,7 @@ export default function FriendPage() {
       socket.current.disconnect();
     };
 
-  }, [authData]);
+  }, [userFriends]);
   const allFriends = userFriends?.pages?.flatMap((page) => page.friends || []);
 
   return (

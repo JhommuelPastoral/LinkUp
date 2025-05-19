@@ -74,7 +74,7 @@ export default function PostCard() {
       socket.current.off("user-disconnected", invalidatePosts);
       socket.current.disconnect();
     };
-  }, [authData]);
+  }, [queryClient]);
 
   if (!authData?.user?._id) {
     return <div className="w-full min-h-screen bg-base-200 skeleton" />;

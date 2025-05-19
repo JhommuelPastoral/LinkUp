@@ -94,7 +94,7 @@ export default function SideBar() {
     };
 
 
-  }, [authData]);
+  }, [getOutgoingFriend, getIncomingFriend, recommendAcc, userFriends]);
 
 
   const handleLogout = () => {
