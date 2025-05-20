@@ -58,28 +58,28 @@ export default function PostCard() {
 
     const invalidatePosts = () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      console.log("Posts invalidated");
     };
 
     socket.current.on("newPost", invalidatePosts);
     socket.current.on("likePost", invalidatePosts);
     socket.current.on("newComment", invalidatePosts);
-    socket.current.on("user-connected", invalidatePosts);
-    socket.current.on("user-disconnected", invalidatePosts);
+    // socket.current.on("user-connected", invalidatePosts);
+    // socket.current.on("user-disconnected", invalidatePosts);
 
     return () => {
       socket.current.off("newPost", invalidatePosts);
       socket.current.off("likePost", invalidatePosts);
       socket.current.off("newComment", invalidatePosts);
-      socket.current.off("user-connected", invalidatePosts);
-      socket.current.off("user-disconnected", invalidatePosts);
+      // socket.current.off("user-connected", invalidatePosts);
+      // socket.current.off("user-disconnected", invalidatePosts);
       socket.current.disconnect();
     };
   }, [queryClient]);
 
-  if (!authData?.user?._id || !postsData) {
+  if (!authData?.user?._id) {
     return <div className="w-full min-h-screen bg-base-200 skeleton" />;
   }
-
 
   const posts = postsData?.pages?.flatMap((page) => page.posts) || [];
 
