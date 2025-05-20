@@ -9,6 +9,7 @@ export default function Profile({authData}) {
   const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [allLikesUser, setAllLikes] = useState([]);
+
   const [value, setValue] = useState({
     totalPosts: 0,
     totalLikes: 0,
@@ -58,11 +59,13 @@ export default function Profile({authData}) {
     });
 
     return () => {
+      socket.current.off(`newPost${authData?.user?._id}`);
+      socket.current.disconnect();
       postsControl.stop();
       likesControl.stop();
       friendsControl.stop();
     }
-  }, [posts,allLikesUser]);
+  }, [posts]);
 
   return (
     <>

@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { login, getRecommendUser } from "../lib/api.js";
-import { useState, useEffect, useRef } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { login } from "../lib/api.js";
+import { useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { Link } from "react-router";
 import { toast } from "react-hot-toast";
@@ -12,11 +12,7 @@ export default function LoginPage() {
     email: "",
     password: "",
   });
-  const {data: recommendedUser = [],refetch} = useQuery({
-    queryKey: ["recommendedUser"],
-    queryFn: getRecommendUser,
-    retry: false,
-  });
+
   const queryClient = useQueryClient();
 
   const { mutate: siginMutation } = useMutation({
@@ -31,18 +27,6 @@ export default function LoginPage() {
     },
   });
 
-  useEffect(() => {
-    socketRef.current = io("http://localhost:5001");
-
-    socketRef.current.on("recommendUser", () => {
-      console.log("Socket event: recommendUser");
-      refetch(); 
-    });
-
-    return () => {
-      socketRef.current.disconnect();
-    };
-  }, [refetch]);
 
 
   const handleSubmit = (e) => {

@@ -84,7 +84,7 @@ export default function RightSidebar() {
     const onlineIds = recommendAcc?.recommendUser?.filter((acc) => acc.isOnline) || [];
     setOnlineUsers(onlineIds);
     setFilterRecommendAcc(filterAcc);
-        return () => {
+    return () => {
       if (Socket.current) {
         Socket.current.off('user-connected');
         Socket.current.off('recommendUser');

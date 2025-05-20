@@ -64,6 +64,13 @@ export default function SuggestedFriends() {
     const flatRecommended = recommended?.pages?.flatMap((page) => page.recommendUser) || [];
     const filtered = flatRecommended?.filter((acc) => !outgoingFriendRequests?.includes(acc?._id) && !incomingFriendRequests?.includes(acc?._id)) || [];
     setFilterRecommendAcc(filtered);
+
+    return ()=>{
+      socket.current?.off(`outgoingFriendRequests${authData?.user?._id.toString()}`);
+      socket.current?.off(`incomingFriendRequests${authData?.user?._id.toString()}`);
+      socket.current.disconnect();
+    }
+
     
   },[recommended, getOutgoingFriend, getIncomingFriend])
 

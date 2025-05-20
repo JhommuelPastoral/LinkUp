@@ -90,6 +90,8 @@ export default function SideBar() {
     return () => {
       socket.current.off(`outgoingFriendRequests${authData?.user?._id.toString()}`);
       socket.current.off(`incomingFriendRequests${authData?.user?._id.toString()}`);
+      socket.current.off("getRecommendedFriends");
+      socket.current.off(`acceptedFriendRequest${authData?.user?._id.toString()}`);
       socket.current.disconnect();
     };
 

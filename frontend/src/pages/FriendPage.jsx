@@ -34,12 +34,12 @@ export default function FriendPage() {
 
 
     return () => {
+      socket.current.off(`acceptedFriendRequest${authData?.user?._id}`);
       socket.current.disconnect();
     };
 
   }, [userFriends]);
   const allFriends = userFriends?.pages?.flatMap((page) => page.friends || []);
-
   return (
     <div className="flex flex-col p-5  max-w-[600px] mx-auto font-Poppins gap-5" >
       <p className="text-2xl font-semibold  ">Friends</p>
@@ -57,7 +57,7 @@ export default function FriendPage() {
                 </div>
                 <div className="flex flex-col">
                   <p className="text-sm font-semibold">{acc?.fullname}</p>
-                  <p className="text-xs">asd</p>
+                  <p className="text-xs">@{acc?.fullname}</p>
                 </div>
               </div>
               <button className="btn btn-sm" onClick={() => handleAddFriend(acc?._id)}> Send Message</button>
