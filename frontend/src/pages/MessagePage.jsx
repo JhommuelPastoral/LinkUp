@@ -29,7 +29,7 @@ export default function MessagePage() {
     refetch: refetchChatMessages,
     isFetching: isLoadingMessages,
   } = useQuery({
-    queryKey: ['chat', authData?.user?._id, selectedFriend?._id],
+    queryKey: ['chat'],
     queryFn: () =>
       getChat({
         senderId: authData?.user?._id,

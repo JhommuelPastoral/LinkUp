@@ -9,4 +9,8 @@
   --font-Poppins: Poppins;
 
 
+
+}
+html{
+  scroll-behavior: smooth;
 }
