@@ -77,7 +77,7 @@ export default function PostCard() {
     };
   }, [queryClient]);
 
-  if (!authData?.user?._id) {
+  if (!authData || !postsData) {
     return <div className="w-full min-h-screen bg-base-200 skeleton" />;
   }
 
