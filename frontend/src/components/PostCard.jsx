@@ -54,6 +54,10 @@ export default function PostCard() {
   };
 
   useEffect(() => {
+    
+    if (!authData || !postsData) {
+      return <div className="w-full min-h-screen bg-base-200 skeleton" />;
+    }
     socket.current = io(backendUrl);
 
     const invalidatePosts = () => {
@@ -77,9 +81,6 @@ export default function PostCard() {
     };
   }, [queryClient]);
 
-  if (!authData || !postsData) {
-    return <div className="w-full min-h-screen bg-base-200 skeleton" />;
-  }
 
   const posts = postsData?.pages?.flatMap((page) => page.posts) || [];
 
@@ -184,7 +185,7 @@ function LikeImageWithEffect({ src, postId, isLiked, onLike }) {
       <img
         src={src}
         alt="Post"
-        className="w-full h-full rounded-lg select-none cursor-pointer"
+        className="w-full h-full rounded-lg select-none cursor-pointer object-contain"
       />
       <AnimatePresence>
         {showHeart && (

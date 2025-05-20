@@ -91,7 +91,7 @@ export default function CommentModal({ post, onClose }) {
         <div className="w-[70%] max-h-full border-r border-gray-600">
           <img
             src={post?.img}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             alt="Post"
           />
         </div>
