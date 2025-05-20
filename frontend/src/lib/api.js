@@ -191,3 +191,23 @@ export const addComment = async (data)=>{
     throw  Error(error.response?.data?.message );
   }
 }
+
+export const sendChat = async (data)=>{
+  try {
+    const response = await axiosInstance.post(`/user/sendchat`,data);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
+
+export const getChat = async (data) => {
+  try {
+    const response = await axiosInstance.get(
+      `/user/getchat?userId=${data.senderId}&recepientId=${data.receiverId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw Error(error.response?.data?.message || "Failed to fetch chat");
+  }
+};

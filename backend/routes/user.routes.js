@@ -2,6 +2,7 @@ import express from "express";
 import protectedRoute from "../middleware/auth.middleware.js";
 import { getRecommendedFriends,addFriend, getOnlineUsers, getPaginatedFriends, getOutgoingFriendRequests,getIncomingFriendRequests, getSingleRecommendeduser, acceptFriendRequest,getFriends } from "../controllers/user.controllers.js";
 import { post,getPosts, likePosts, getAllUserPosts, AddComment, getSpecificPosts} from "../controllers/post.controllers.js";
+import { sendChat, getChat } from "../controllers/chat.controllers.js";
 const userRoutes =  (io) => {
   
   const router = express.Router();
@@ -23,6 +24,12 @@ const userRoutes =  (io) => {
   router.post("/likepost/:id",protectedRoute, (req, res) => likePosts(req, res,io));
   router.get('/getuserposts',protectedRoute, (req, res) => getAllUserPosts(req, res));
   router.get('/getspecificpost/:id',protectedRoute, (req, res) => getSpecificPosts(req, res));
+
+  //Chat 
+  router.post("/sendchat",protectedRoute, (req, res) => sendChat(req, res,io));
+  router.get('/getchat',protectedRoute, (req, res) => getChat(req, res,io));
+
+
 
   return router;
 

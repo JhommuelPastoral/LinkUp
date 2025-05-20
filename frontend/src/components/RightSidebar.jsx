@@ -21,7 +21,7 @@ export default function RightSidebar() {
     queryKey: ['recommendUser'],
     queryFn: getRecommendUser
   });
-  const hiddenLocation = ['/explore/friends', '/profile'];
+  const hiddenLocation = ['/explore/friends', '/profile', '/message'];
 
 
   const {data: getOutgoingFriend=[], refetch: outGoingFriendRequestsRefetch} = useQuery({
