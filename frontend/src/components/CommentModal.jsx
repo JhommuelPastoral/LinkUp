@@ -84,71 +84,81 @@ export default function CommentModal({ post, onClose }) {
 
   const Comments = fetchData?.Allposts?.comments;
 
-  return (
-    <>
-      <X className="fixed top-5 right-10 z-50 cursor-pointer" onClick={handleClose} />
-      <div className="modal-box relative max-h-[95%] max-w-[80%] flex p-0">
-        <div className="w-[70%] max-h-full border-r border-gray-600">
-          <img
-            src={post?.img}
-            className="w-full h-full object-contain"
-            alt="Post"
-          />
+return (
+  <>
+    <X 
+      className="fixed top-4 right-4 z-50 cursor-pointer md:top-5 md:right-10" 
+      onClick={handleClose} 
+    />
+    <div className="modal-box relative w-full max-w-full md:max-w-[90%] lg:max-w-[80%] h-[90vh] flex flex-col md:flex-row p-0 overflow-hidden">
+      {/* Image Container - Full width on mobile, 70% on desktop */}
+      <div className="w-full md:w-[60%] lg:w-[70%] h-[40vh] md:h-full border-b md:border-b-0 md:border-r border-gray-600">
+        <img
+          src={post?.img}
+          className="w-full h-full object-contain"
+          alt="Post"
+        />
+      </div>
+
+      {/* Comments and User Info Container - Full width on mobile, 30% on desktop */}
+      <div className="flex flex-col w-full md:w-[40%] lg:w-[30%] h-[50vh] md:h-full">
+        {/* User Info */}
+        <div className="flex items-center p-2 md:p-2.5">
+          <div className="flex items-center gap-2">
+            <img
+              src={post?.userId?.profileImage}
+              className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded-full object-cover"
+              alt="User"
+            />
+            <p className="text-xs md:text-sm font-semibold">{post?.userId?.fullname}</p>
+          </div>
         </div>
 
-        <div className="flex flex-col w-[30%]">
-          {/* User Info */}
-          <div className="flex items-center p-2.5">
-            <div className="flex items-center gap-2.5">
-              <img
-                src={post?.userId?.profileImage}
-                className="w-12 h-12 rounded-full object-cover"
-                alt="User"
-              />
-              <p className="text-sm font-semibold">{post?.userId?.fullname}</p>
-            </div>
-          </div>
-
-          {/* Comments */}
-          <div className="flex flex-col gap-2.5 p-2.5 overflow-y-auto border border-gray-600 h-full">
-            {commentsLoading ? (
-              <p>Loading Comments...</p>
-            ) : (
-              Comments?.slice()?.reverse()?.map((comment) => (
-                <div className="flex items-center gap-2.5" key={comment._id}>
-                  <img
-                    src={comment?.userId?.profileImage}
-                    className="w-12 h-12 rounded-full object-cover"
-                    alt="Commenter"
-                  />
-                  <div className="flex flex-col w-[90%]">
-                    <p className="text-sm font-semibold">{comment?.userId?.fullname}</p>
-                    <p className="text-sm">{comment?.message}</p>
-                  </div>
+        {/* Comments - scrollable area */}
+        <div className="flex flex-col gap-2 md:gap-2.5 p-2 md:p-2.5 overflow-y-auto border-y md:border-y-0 md:border border-gray-600 flex-grow">
+          {commentsLoading ? (
+            <p className="text-center text-sm">Loading Comments...</p>
+          ) : Comments?.length === 0 ? (
+            <p className="text-center text-sm text-gray-400">No comments yet</p>
+          ) : (
+            Comments?.slice()?.reverse()?.map((comment) => (
+              <div className="flex items-start gap-2 md:gap-2.5" key={comment._id}>
+                <img
+                  src={comment?.userId?.profileImage}
+                  className="w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-full object-cover"
+                  alt="Commenter"
+                />
+                <div className="flex flex-col w-[90%]">
+                  <p className="text-xs md:text-sm font-semibold">{comment?.userId?.fullname}</p>
+                  <p className="text-xs md:text-sm break-words">{comment?.message}</p>
                 </div>
-              ))
-            )}
-          </div>
+              </div>
+            ))
+          )}
+        </div>
 
-          {/* Comment Input */}
-          <div className="flex w-full p-2.5 border-t border-gray-600">
-            <div className="w-full flex items-center gap-2.5">
-              <textarea
-                className="textarea resize-none w-full text-sm"
-                onChange={(e) =>
-                  setCommentData({ ...commentData, comment: e.target.value })
-                }
-                value={commentData.comment}
-                placeholder="Add a comment..."
-                rows={1}
-              ></textarea>
-              <button className="btn bg-transparent" onClick={handleSubmit}>
-                Post
-              </button>
-            </div>
+        {/* Comment Input */}
+        <div className="flex w-full p-2 md:p-2.5 border-t border-gray-600 mt-auto">
+          <div className="w-full flex items-center gap-2">
+            <textarea
+              className="textarea resize-none w-full text-xs md:text-sm p-2 rounded"
+              onChange={(e) =>
+                setCommentData({ ...commentData, comment: e.target.value })
+              }
+              value={commentData.comment}
+              placeholder="Add a comment..."
+              rows={1}
+            ></textarea>
+            <button 
+              className="btn bg-transparent text-xs md:text-sm px-2 py-1"
+              onClick={handleSubmit}
+            >
+              Post
+            </button>
           </div>
         </div>
       </div>
-    </>
-  );
+    </div>
+  </>
+);
 }

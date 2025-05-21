@@ -69,33 +69,51 @@ export default function Profile({authData}) {
 
   return (
     <>
-      <div className="flex gap-10 items-center justify-center border-b border-base-300 pb-2.5">
-      <div>
-        <img src={authData?.user?.profileImage} className="w-30 h-30 rounded-full object-cover object-center" />
-        <p className="font-semibold text-xl text-center">{authData?.user?.fullname}</p>
-        <p className="text-center text-light ">{authData?.user?.bio}</p>
-      </div>
-      <div className="flex flex-col gap-5 items-center">
-        <div className="stats shadow">
-          <div className="stat place-items-center">
-            <div className="stat-title">Total Posts</div>
-            <div className="stat-value">{value.totalPosts >= 1000 ? `${Math.floor(value.totalPosts / 1000)}K` : value.totalPosts}</div>
-            <div className="stat-desc">From {dayjs(authData?.user?.createdAt).format("MMM-DD-YYYY")} to {dayjs().format("MMM-DD-YYYY")}</div>
-          </div>
+      <div className="flex flex-col lg:flex-row gap-10 items-center justify-center border-b border-base-300 pb-2.5 px-4">
+        
+        {/* Profile Section */}
+        <div className="flex flex-col items-center text-center">
+          <img
+            src={authData?.user?.profileImage}
+            className="w-28 h-28 lg:w-30 lg:h-30 rounded-full object-cover object-center"
+            alt="User"
+          />
+          <p className="font-semibold text-xl mt-2">{authData?.user?.fullname}</p>
+          <p className="text-light">{authData?.user?.bio}</p>
+        </div>
 
-          <div className="stat place-items-center">
-            <div className="stat-title">Total Likes</div>
-            <div className="stat-value text-secondary">{value.totalLikes >= 1000 ? `${Math.floor(value.totalLikes / 1000)}K` : value.totalLikes}</div>
-          </div>
+        {/* Stats Section */}
+        <div className="hidden md:flex flex-col gap-5 items-center w-full max-w-md ">
+          <div className="stats shadow w-full">
+            <div className="stat place-items-center text-center">
+              <div className="stat-title">Total Posts</div>
+              <div className="stat-value">
+                {value.totalPosts >= 1000 ? `${Math.floor(value.totalPosts / 1000)}K` : value.totalPosts}
+              </div>
+              <div className="stat-desc">
+                From {dayjs(authData?.user?.createdAt).format("MMM-DD-YYYY")} to {dayjs().format("MMM-DD-YYYY")}
+              </div>
+            </div>
 
-          <div className="stat place-items-center">
-            <div className="stat-title">Total Friends</div>
-            <div className="stat-value">{value.totalFriends >= 1000 ? `${Math.floor(value.totalFriends / 1000)}K` : value.totalFriends}</div>
+            <div className="stat place-items-center text-center">
+              <div className="stat-title">Total Likes</div>
+              <div className="stat-value text-secondary">
+                {value.totalLikes >= 1000 ? `${Math.floor(value.totalLikes / 1000)}K` : value.totalLikes}
+              </div>
+            </div>
+
+            <div className="stat place-items-center text-center">
+              <div className="stat-title">Total Friends</div>
+              <div className="stat-value">
+                {value.totalFriends >= 1000 ? `${Math.floor(value.totalFriends / 1000)}K` : value.totalFriends}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      </div>  
+
       <AllPost posts={posts} authData={authData.user} />
     </>
-    )
+  );
+
 }
