@@ -77,7 +77,7 @@ export default function AllPost({ authData }) {
   const posts = getPost?.Allposts;
 
   return (
-    <div className=" mt-5 max-w-[700px] mx-auto ">
+    <div className=" mt-5 max-w-[700px] mx-auto pb-15">
       {posts?.Allposts?.length === 0 ? (
         <p className="text-center">No Post Available</p>
       ): (

@@ -69,28 +69,30 @@ export default function Profile({authData}) {
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row gap-10 items-center justify-center border-b border-base-300 pb-2.5 px-4">
-        
+      <div className="flex flex-col lg:flex-row gap-10 items-center justify-center border-b border-base-300 pb-2.5 px-4 ">
         {/* Profile Section */}
-        <div className="flex flex-col items-center text-center">
-          <img
-            src={authData?.user?.profileImage}
-            className="w-28 h-28 lg:w-30 lg:h-30 rounded-full object-cover object-center"
-            alt="User"
-          />
+        <div className="flex flex-col items-center text-center ">
+          <div className="w-28 h-28">
+            <img
+              src={authData?.user?.profileImage}
+              className="w-28 h-28 rounded-full object-cover object-center"
+              alt="User"
+            />
+
+          </div>
           <p className="font-semibold text-xl mt-2">{authData?.user?.fullname}</p>
           <p className="text-light">{authData?.user?.bio}</p>
         </div>
 
         {/* Stats Section */}
-        <div className="hidden md:flex flex-col gap-5 items-center w-full max-w-md ">
-          <div className="stats shadow w-full">
+        <div className="hidden md:flex flex-col gap-5 w-full   ">
+          <div className="stats shadow w-full  items-start">
             <div className="stat place-items-center text-center">
               <div className="stat-title">Total Posts</div>
               <div className="stat-value">
                 {value.totalPosts >= 1000 ? `${Math.floor(value.totalPosts / 1000)}K` : value.totalPosts}
               </div>
-              <div className="stat-desc">
+              <div className="stat-desc hidden lg:flex">
                 From {dayjs(authData?.user?.createdAt).format("MMM-DD-YYYY")} to {dayjs().format("MMM-DD-YYYY")}
               </div>
             </div>
