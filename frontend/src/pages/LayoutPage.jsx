@@ -6,7 +6,7 @@ export default function LayoutPage({children}) {
   return (
     <>
       <div className="flex min-h-screen">
-        <div className="hidden lg:block sticky top-0 h-screen w-[300px]">
+        <div className="sticky top-0 h-screen z-50 ">
           <SideBar />
         </div>
         <main className="flex-1">

@@ -105,70 +105,106 @@ export default function SideBar() {
 
 
   return (
-    <aside className="h-full p-5 flex flex-col gap-6 rounded-r-2xl w-60">
-      {/* Branding */}
-      <div className="text-xl font-bold tracking-tight ">
-        <Link to="/home">LinkUp</Link>
-      </div>
+    <>
+      {/* Desktop view */}
+      <aside className="hidden lg:flex h-full p-5  flex-col gap-6 rounded-r-2xl w-60">
+        {/* Branding */}
+        <div className="text-xl font-bold tracking-tight ">
+          <Link to="/home">LinkUp</Link>
+        </div>
 
-      {/* Navigation */}
-      <nav className="flex flex-col gap-3">
-        {navLinks.map(({ to, label, icon }) => (
+        {/* Navigation */}
+        <nav className="flex flex-col gap-3">
+          {navLinks.map(({ to, label, icon }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`flex items-center gap-3 px-4 py-2 justify-between rounded-lg transition-colors duration-200 ${
+                currentPath === to
+                  ? 'bg-primary text-primary-content'
+                  : 'hover:bg-base-200'
+              }`}
+            >    
+            <div className="flex items-center gap-3">
+              {icon}
+              <span>{label}</span>
+            </div>
+            {badgeCounts[label] > 0 && (
+              <span
+                className={`text-xs text-white rounded-full px-2 py-0.5 bg-error`}
+              >
+                {badgeCounts[label]}
+              </span>
+            )}
+
+            </Link>
+          ))}
+
+          {/* Profile */}
           <Link
-            key={to}
-            to={to}
-            className={`flex items-center gap-3 px-4 py-2 justify-between rounded-lg transition-colors duration-200 ${
-              currentPath === to
+            to="/profile"
+            className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors duration-200 ${
+              currentPath === '/profile'
                 ? 'bg-primary text-primary-content'
                 : 'hover:bg-base-200'
             }`}
-          >    
-          <div className="flex items-center gap-3">
-            {icon}
-            <span>{label}</span>
-          </div>
-          {badgeCounts[label] > 0 && (
-            <span
-              className={`text-xs text-white rounded-full px-2 py-0.5 bg-error`}
-            >
-              {badgeCounts[label]}
-            </span>
-          )}
-
+          >
+            <img
+              src={authData?.user?.profileImage || '/default-avatar.png'}
+              alt="Profile"
+              className="w-7 h-7 rounded-full object-cover"
+            />
+            <span>Profile</span>
           </Link>
-        ))}
 
-        {/* Profile */}
-        <Link
-          to="/profile"
-          className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors duration-200 ${
-            currentPath === '/profile'
-              ? 'bg-primary text-primary-content'
-              : 'hover:bg-base-200'
-          }`}
-        >
+          {/* Theme Selector */}
+          <ThemeSelector className="mt-4" />
+        </nav>
+
+        {/* Footer */}
+        <footer className="mt-auto text-xs text-base-content/60 w-full flex flex-col gap-5">
+          <button
+            className="flex items-center gap-3 px-4 py-2 w-full rounded-lg transition-colors duration-200 btn"
+            onClick={handleLogout}
+          >
+            Log out
+          </button>
+          <p>&copy; 2025 LinkUp</p>
+        </footer>
+      </aside>
+      
+      {/* Mobile view */}
+    <div className="dock dock-sm lg:hidden w-full ">
+      <Link to="/home" className={`${currentPath === '/home' ? 'dock-active' : ''}`}>
+        <button className={` flex-col flex items-center`}>
+          <House />
+        </button>
+      </Link>
+
+      <Link to="/friends" className={`${currentPath === '/friends' ? 'dock-active' : ''}`}>
+        <button >
+          <Users />
+        </button>
+      </Link>
+
+      <Link to="/message" className={`${currentPath === '/message' ? 'dock-active' : ''}`}>
+        <button >
+          <Send />
+        </button>
+      </Link>
+
+      <Link to="/profile" className={`${currentPath === '/profile' ? 'dock-active' : ''}`}>
+        <button className="w-10 h-10 rounded-full overflow-hidden">
           <img
             src={authData?.user?.profileImage || '/default-avatar.png'}
             alt="Profile"
-            className="w-7 h-7 rounded-full object-cover"
+            className="w-full h-full object-cover"
           />
-          <span>Profile</span>
-        </Link>
-
-        {/* Theme Selector */}
-        <ThemeSelector className="mt-4" />
-      </nav>
-
-      {/* Footer */}
-      <footer className="mt-auto text-xs text-base-content/60 w-full flex flex-col gap-5">
-        <button
-          className="flex items-center gap-3 px-4 py-2 w-full rounded-lg transition-colors duration-200 btn"
-          onClick={handleLogout}
-        >
-          Log out
         </button>
-        <p>&copy; 2025 LinkUp</p>
-      </footer>
-    </aside>
+      </Link>
+    </div>
+
+    
+    </>
   );
 }

@@ -22,24 +22,6 @@ const io = new Server(server, {
 });
 const onlineUsers = new Map();  
 
-// io.on("connection",  (socket) => {
-//   socket.on("user-connected", async (userId) => {
-//     onlineUsers.set(userId, socket.id);
-//     await User.findByIdAndUpdate(userId, {isOnline: true}, {new: true});
-//     socket.broadcast.emit("user-connected", userId);
-//   });
-
-//   socket.on("user-disconnected", async () => {
-//     const userId = [...onlineUsers.entries()].find(([key, id]) => id === socket.id)?.[0];
-//     console.log('user-disconnected', userId);
-//     if(userId){
-//       onlineUsers.delete(userId);
-//       await User.findByIdAndUpdate(userId, {isOnline: false}, {new: true});
-//       socket.broadcast.emit("user-disconnected", userId);
-//     }
-//   });
-
-// })
 
 io.on("connection", (socket) => {
   socket.on("user-connected", async (userId) => {
