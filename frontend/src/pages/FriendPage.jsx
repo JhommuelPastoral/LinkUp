@@ -60,7 +60,7 @@ export default function FriendPage() {
                   <p className="text-xs">@{acc?.fullname}</p>
                 </div>
               </div>
-              <button className="btn btn-sm" onClick={() => handleAddFriend(acc?._id)}> Send Message</button>
+              <button className="btn btn-sm" > Send Message</button>
             </div>
             
           ))

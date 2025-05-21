@@ -16,14 +16,12 @@ export default function MessagePage() {
   const messagesEndRef = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  // Query to get friends list
   const { data: friendsData, isLoading } = useQuery({
     queryKey: ['friends', authData?.user?._id],
     queryFn: () => getFriends(authData?.user?._id),
     enabled: !!authData?.user?._id,
   });
 
-  // Query to get chat messages
   const {
     data: chatMessagesData = { messages: [] },
     refetch: refetchChatMessages,
@@ -74,7 +72,6 @@ export default function MessagePage() {
     };
   }, [authData?.user?._id, backendUrl]);
 
-  // Scroll to bottom when chat messages update and loading is done
   useEffect(() => {
     if (!isLoadingMessages && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -127,146 +124,285 @@ export default function MessagePage() {
   }
 
   return (
-    <div className="max-w-screen mx-auto flex font-Poppins gap-2.5 p-5">
-      <div className={`w-64 space-y-5 h-[calc(100vh-40px)] ${isLoading ? 'skeleton' : ''}`}>
-        <p className="text-lg font-semibold">Messages</p>
-        {friends.map((friend) => (
-          <div
-            onClick={() => handleClickFriend(friend)}
-            key={friend._id}
-            className={`flex items-center gap-3 px-4 py-2 cursor-pointer rounded-lg transition-colors duration-200 ${
-              selectedFriend?._id === friend._id ? 'bg-base-200' : 'hover:bg-base-300'
-            }`}
-          >
-            <img
-              className="w-12 h-12 rounded-full object-cover"
-              src={friend.profileImage}
-              alt={friend.fullname}
-            />
-            <p>{friend.fullname}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="w-full h-[calc(100vh-40px)] space-y-2.5 bg-base-300 p-5 rounded-2xl">
-        {!selectedFriend ? (
-          <div className="flex items-center justify-center h-full">Select a friend</div>
-        ) : (
-          <>
-            <div className="items-center flex gap-2.5">
-              <img
-                src={selectedFriend?.profileImage}
-                alt={selectedFriend?.fullname}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <p className="font-semibold">{selectedFriend?.fullname}</p>
-            </div>
-
-            {/* Messages */}
+    <>
+      {/* Desktop View */}
+      <div className="hidden max-w-screen mx-auto lg:flex font-Poppins gap-2.5 p-5">
+        <div className={`w-64 space-y-5 h-[calc(100vh-40px)] ${isLoading ? 'skeleton' : ''}`}>
+          <p className="text-lg font-semibold">Messages</p>
+          {friends.map((friend) => (
             <div
-              className={`bg-base-100 rounded-2xl flex flex-col ${
-                imagePreview ? 'h-[calc(100vh-300px)]' : 'h-[calc(100vh-230px)]'
-              } overflow-y-auto p-2.5`}
+              onClick={() => handleClickFriend(friend)}
+              key={friend._id}
+              className={`flex items-center gap-3 px-4 py-2 cursor-pointer rounded-lg transition-colors duration-200 ${
+                selectedFriend?._id === friend._id ? 'bg-base-200' : 'hover:bg-base-300'
+              }`}
             >
-              {isLoadingMessages ? (
-                <div className="flex items-center justify-center h-full">
-                  <span className="loading loading-dots loading-md"></span>
-                </div>
-              ) : chatMessagesData?.messages?.length > 0 ? (
-                <>
-                  {chatMessagesData.messages.map((msg, index) => (
-                    <div
-                      key={index}
-                      className={`chat ${
-                        msg.id === authData.user._id ? 'chat-end' : 'chat-start'
-                      }`}
-                    >
-                      <div className="chat-image avatar">
-                        <div className="w-10 rounded-full">
-                          <img
-                            alt="User avatar"
-                            src={
-                              msg.id === authData.user._id
-                                ? authData.user.profileImage
-                                : selectedFriend.profileImage
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div className="chat-header">
-                        {msg.senderId === authData.user._id ? 'You' : selectedFriend.fullname}
-                        <time className="text-xs opacity-50 ml-2">
-                          {dayjs(msg.date).format('HH:mm')}
-                        </time>
-                      </div>
-                      <div className="chat-bubble">
-                        {msg.image && <img src={msg.image} className="h-20 mb-2" />}
-                        {msg.text}
-                      </div>
-                      <div className="chat-footer opacity-50">Delivered</div>
-                    </div>
-                  ))}
-                  {/* Scroll anchor */}
-                  <div ref={messagesEndRef} />
-                </>
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  No messages yet. Start a conversation!
-                </div>
-              )}
+              <img
+                className="w-12 h-12 rounded-full object-cover"
+                src={friend.profileImage}
+                alt={friend.fullname}
+              />
+              <p>{friend.fullname}</p>
             </div>
+          ))}
+        </div>
 
-            {/* Image Preview */}
-            {imagePreview && (
-              <div className="relative w-20 h-20 mb-2">
+        <div className="w-full h-[calc(100vh-40px)] space-y-2.5 bg-base-300 p-5 rounded-2xl">
+          {!selectedFriend ? (
+            <div className="flex items-center justify-center h-full">Select a friend</div>
+          ) : (
+            <>
+              <div className="items-center flex gap-2.5">
                 <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-full object-cover rounded-lg"
+                  src={selectedFriend?.profileImage}
+                  alt={selectedFriend?.fullname}
+                  className="w-12 h-12 rounded-full object-cover"
                 />
-                <button
-                  onClick={removeImagePreview}
-                  className="absolute top-1 right-1 bg-gray-800 p-1 rounded-full text-white hover:bg-gray-700"
-                >
-                  <X size={16} />
-                </button>
+                <p className="font-semibold">{selectedFriend?.fullname}</p>
               </div>
-            )}
 
-            <div className="flex flex-col gap-2">
-              <div className="flex h-20 items-center justify-between gap-2.5">
-                <textarea
-                  className="textarea resize-none w-full border-none rounded-2xl"
-                  placeholder="Send a message..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                ></textarea>
+              {/* Messages */}
+              <div
+                className={`bg-base-100 rounded-2xl flex flex-col ${
+                  imagePreview ? 'h-[calc(100vh-300px)]' : 'h-[calc(100vh-230px)]'
+                } overflow-y-auto p-2.5`}
+              >
+                {isLoadingMessages ? (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="loading loading-dots loading-md"></span>
+                  </div>
+                ) : chatMessagesData?.messages?.length > 0 ? (
+                  <>
+                    {chatMessagesData.messages.map((msg, index) => (
+                      <div
+                        key={index}
+                        className={`chat ${
+                          msg.id === authData.user._id ? 'chat-end' : 'chat-start'
+                        }`}
+                      >
+                        <div className="chat-image avatar">
+                          <div className="w-10 rounded-full">
+                            <img
+                              alt="User avatar"
+                              src={
+                                msg.id === authData.user._id
+                                  ? authData.user.profileImage
+                                  : selectedFriend.profileImage
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="chat-header">
+                          {msg.senderId === authData.user._id ? 'You' : selectedFriend.fullname}
+                          <time className="text-xs opacity-50 ml-2">
+                            {dayjs(msg.date).format('HH:mm')}
+                          </time>
+                        </div>
+                        <div className="chat-bubble">
+                          {msg.image && <img src={msg.image} className="h-20 mb-2" />}
+                          {msg.text}
+                        </div>
+                        <div className="chat-footer opacity-50">Delivered</div>
+                      </div>
+                    ))}
+                    {/* Scroll anchor */}
+                    <div ref={messagesEndRef} />
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    No messages yet. Start a conversation!
+                  </div>
+                )}
+              </div>
 
-                <div className="flex gap-2">
-                  <label htmlFor="image-upload" className="btn btn-circle">
-                    <ImagePlus size={20} />
-                  </label>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageUpload}
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="relative w-20 h-20 mb-2">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-full object-cover rounded-lg"
                   />
-
                   <button
-                    className="btn btn-soft flex items-center gap-2"
-                    onClick={handleSendMessage}
+                    onClick={removeImagePreview}
+                    className="absolute top-1 right-1 bg-gray-800 p-1 rounded-full text-white hover:bg-gray-700"
                   >
-                    <Send />
-                    Send
+                    <X size={16} />
                   </button>
                 </div>
+              )}
+
+              <div className="flex flex-col gap-2">
+                <div className="flex h-20 items-center justify-between gap-2.5">
+                  <textarea
+                    className="textarea resize-none w-full border-none rounded-2xl"
+                    placeholder="Send a message..."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                  ></textarea>
+
+                  <div className="flex gap-2">
+                    <label htmlFor="image-upload" className="btn btn-circle">
+                      <ImagePlus size={20} />
+                    </label>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
+
+                    <button
+                      className="btn btn-soft flex items-center gap-2"
+                      onClick={handleSendMessage}
+                    >
+                      <Send />
+                      Send
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+      
+      {/* Moblie View */}
+      <div className='max-w-screen overflow-x-auto flex gap-2.5 mb-2.5'>
+        <div className={`flex ${isLoading ? 'skeleton' : ''}`}>
+          {friends.map((friend) => (
+            <div
+              onClick={() => handleClickFriend(friend)}
+              key={friend._id}
+              className={`  flex flex-col w-20 items-center gap-3 px-4 py-2 cursor-pointer rounded-lg transition-colors duration-200 ${
+                selectedFriend?._id === friend._id ? 'bg-base-200' : 'hover:bg-base-300'
+              }`}
+            >
+              <img
+                className="w-12 h-12 rounded-full object-cover"
+                src={friend.profileImage}
+                alt={friend.fullname}
+              />
+              <p  className="text-center text-sm max-w-full truncate">{friend.fullname} </p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="w-full min-h-[100px] space-y-2.5 bg-base-300 p-4 rounded-2xl lg:hidden">
+      {!selectedFriend ? (
+        <div className="flex items-center justify-center h-full">Select a friend</div>
+      ) : (
+        <>
+          <div className="flex items-center gap-2.5">
+            <img
+              src={selectedFriend?.profileImage}
+              alt={selectedFriend?.fullname}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <p className="font-semibold text-sm">{selectedFriend?.fullname}</p>
+          </div>
+
+          {/* Chat Messages */}
+          <div
+            className={`bg-base-100 rounded-2xl flex flex-col flex-grow overflow-y-auto p-2.5 sm:h-[400px] ${imagePreview ? 'h-[250px]' : 'h-[300px]'}`}
+          >
+            {isLoadingMessages ? (
+              <div className="flex items-center justify-center h-full">
+                <span className="loading loading-dots loading-md"></span>
+              </div>
+            ) : chatMessagesData?.messages?.length > 0 ? (
+              <>
+                {chatMessagesData.messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`chat ${msg.id === authData.user._id ? 'chat-end' : 'chat-start'}`}
+                  >
+                    <div className="chat-image avatar">
+                      <div className="w-8 rounded-full">
+                        <img
+                          alt="User avatar"
+                          src={
+                            msg.id === authData.user._id
+                              ? authData.user.profileImage
+                              : selectedFriend.profileImage
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="chat-header text-xs">
+                      {msg.senderId === authData.user._id ? 'You' : selectedFriend.fullname}
+                      <time className="text-xs opacity-50 ml-1">
+                        {dayjs(msg.date).format('HH:mm')}
+                      </time>
+                    </div>
+                    <div className="chat-bubble text-sm">
+                      {msg.image && <img src={msg.image} className="h-20 mb-2 rounded-md" />}
+                      {msg.text}
+                    </div>
+                    <div className="chat-footer text-[10px] opacity-50">Delivered</div>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                No messages yet. Start a conversation!
+              </div>
+            )}
+          </div>
+
+          {/* Image Preview */}
+          {imagePreview && (
+            <div className="relative w-20 h-20 mb-2">
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-full h-full object-cover rounded-lg"
+              />
+              <button
+                onClick={removeImagePreview}
+                className="absolute top-1 right-1 bg-gray-800 p-1 rounded-full text-white hover:bg-gray-700"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
+
+          {/* Message Input */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2.5">
+              <textarea
+                className="textarea textarea-bordered w-full h-16 rounded-xl resize-none"
+                placeholder="Send a message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+              <div className="flex gap-1">
+                <label htmlFor="image-upload" className="btn btn-circle">
+                  <ImagePlus size={20} />
+                </label>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={handleSendMessage}
+                >
+                  <Send size={16} />
+                </button>
               </div>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
+
+      
+    </>
   );
 }
