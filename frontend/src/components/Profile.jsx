@@ -1,15 +1,16 @@
 import dayjs from "dayjs";
 import { animate } from 'framer-motion';
 import { useState, useEffect, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import {getAllUserPosts} from '../lib/api.js';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {getAllUserPosts, logout} from '../lib/api.js';
 import {io} from 'socket.io-client';
 import AllPost from "./AllPost.jsx";
+
 export default function Profile({authData}) {
   const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [allLikesUser, setAllLikes] = useState([]);
-
+  const queryClient = useQueryClient();
   const [value, setValue] = useState({
     totalPosts: 0,
     totalLikes: 0,
@@ -21,6 +22,12 @@ export default function Profile({authData}) {
     queryFn: getAllUserPosts
   });
 
+  const{mutate: logoutUser} = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["authUser"]);
+    }
+  })
   useEffect(() => {
     if (!posts?.Allposts || !authData?.user?._id) return;
 
@@ -66,11 +73,17 @@ export default function Profile({authData}) {
       friendsControl.stop();
     }
   }, [posts]);
-
+  const handleLogout = () => {
+    logoutUser();
+  }
   return (
     <>
+    <div className="flex justify-end">
+      <button className="btn" onClick={handleLogout}> Logout</button>
+    </div>
       <div className="flex flex-col lg:flex-row gap-10 items-center justify-center border-b border-base-300 pb-2.5 px-4 ">
         {/* Profile Section */}
+
         <div className="flex flex-col items-center text-center ">
           <div className="w-28 h-28">
             <img
@@ -80,8 +93,11 @@ export default function Profile({authData}) {
             />
 
           </div>
-          <p className="font-semibold text-xl mt-2">{authData?.user?.fullname}</p>
-          <p className="text-light">{authData?.user?.bio}</p>
+          <div>
+            <p className="font-semibold text-xl mt-2">{authData?.user?.fullname}</p>
+            <p className="text-light">{authData?.user?.bio}</p>
+
+          </div>
         </div>
 
         {/* Stats Section */}
