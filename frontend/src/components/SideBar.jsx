@@ -66,16 +66,16 @@ export default function SideBar() {
     if(!authData?.user) return;
     socket.current = io(backendUrl);
     socket.current.on(`outgoingFriendRequests${authData?.user?._id.toString()}`, () => {
-      outGoingFriendRequestsRefetch();
+      queryClient.invalidateQueries({ queryKey: ['outgoingFriendRequests'] });
     });
     socket.current.on(`incomingFriendRequests${authData?.user?._id.toString()}`, () => {
-      incomingFriendRequestsRefetch();
+      queryClient.invalidateQueries({ queryKey: ['incomingFriendRequests'] });
     });
     socket.current.on("getRecommendedFriends", () => {
-      recommendUserRefetch();
+      queryClient.invalidateQueries({ queryKey: ['recommendUser'] });
     });
     socket.current.on(`acceptedFriendRequest${authData?.user?._id.toString()}`, () => {
-      userFriendsRefetch();
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
     });
     const outgoingFriendRequests = getOutgoingFriend?.outgoingFriendRequests?.map((req) => req.reciptient?._id);
     const incomingFriendRequests = getIncomingFriend?.incomingFriendRequests?.map((req) => req.sender?._id);

@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import useAuthUser from '../hooks/useAuthUser';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getFriends, sendChat, getChat } from '../lib/api.js';
 import { Send, X, ImagePlus } from 'lucide-react';
 import dayjs from 'dayjs';
 import { io } from 'socket.io-client';
+
 
 export default function MessagePage() {
   const { authData } = useAuthUser();
@@ -15,7 +16,7 @@ export default function MessagePage() {
   const socket = useRef(null);
   const messagesEndRef = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
+  const queryClient = useQueryClient();
   const { data: friendsData, isLoading } = useQuery({
     queryKey: ['friends', authData?.user?._id],
     queryFn: () => getFriends(authData?.user?._id),
@@ -40,7 +41,8 @@ export default function MessagePage() {
   const { mutate: sendMessage } = useMutation({
     mutationFn: sendChat,
     onSuccess: () => {
-      refetchChatMessages();
+      // refetchChatMessages();
+      queryClient.invalidateQueries(['chat']);
     },
   });
 
@@ -51,7 +53,8 @@ export default function MessagePage() {
 
   useEffect(() => {
     if (selectedFriend?._id) {
-      refetchChatMessages();
+      // refetchChatMessages();
+      queryClient.invalidateQueries(['chat']);
     }
   }, [selectedFriend]);
 
@@ -62,7 +65,8 @@ export default function MessagePage() {
     socket.current = io(backendUrl);
 
     socket.current.on(`newMessage${authData.user._id}`, () => {
-      refetchChatMessages();
+      // refetchChatMessages();
+      queryClient.invalidateQueries(['chat']);
     });
 
     return () => {

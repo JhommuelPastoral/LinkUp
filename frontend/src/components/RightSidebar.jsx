@@ -2,7 +2,7 @@ import useAuthUser from '../hooks/useAuthUser.js';
 import {getRecommendUser, addFriend, getOutgoingFriendRequests,getIncomingFriendRequests} from '../lib/api.js'
 import { io } from "socket.io-client";
 import { useRef, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {useLocation} from 'react-router'
 import toast from 'react-hot-toast';
 import { useState } from 'react';
@@ -22,7 +22,7 @@ export default function RightSidebar() {
     queryFn: getRecommendUser
   });
   const hiddenLocation = ['/explore/friends', '/profile', '/message'];
-
+  const queryClient = useQueryClient();
 
   const {data: getOutgoingFriend=[], refetch: outGoingFriendRequestsRefetch} = useQuery({
     queryKey: ['outgoingFriendRequests'],
@@ -47,14 +47,10 @@ export default function RightSidebar() {
   useEffect(() => {
     if (!authData?.user?._id) return;
     Socket.current = io(backendUrl);
-    Socket.current.on('user-disconnected', ()=>{
-      recommendUserRefetch();
-    });
+    Socket.current.on('user-disconnected', ()=>{queryClient.invalidateQueries({queryKey: ['recommendUser']});});
     Socket.current.emit('user-connected',(authData?.user?._id));
-    Socket.current.on('user-connected', () => {recommendUserRefetch();});
-    Socket.current.on('recommendUser', () => {
-      recommendUserRefetch();
-    });
+    Socket.current.on('user-connected', () => {queryClient.invalidateQueries({queryKey: ['recommendUser']});});
+    Socket.current.on('recommendUser', () => {queryClient.invalidateQueries({queryKey: ['recommendUser']});});
     
     Socket.current.on(`outgoingFriendRequests${authData?.user?._id.toString()}`, () => {
       outGoingFriendRequestsRefetch();
@@ -65,9 +61,9 @@ export default function RightSidebar() {
     });
 
     Socket.current.on(`acceptedFriendRequest${authData?.user?._id.toString()}`, () => {
-      recommendUserRefetch();
-      incomingFriendRequestsRefetch();
-      outGoingFriendRequestsRefetch();
+      queryClient.invalidateQueries({queryKey: ['recommendUser']});
+      queryClient.invalidateQueries({queryKey: ['outgoingFriendRequests']});
+      queryClient.invalidateQueries({queryKey: ['incomingFriendRequests']});
     });
 
     // Get all the ids in the outgoing friend request

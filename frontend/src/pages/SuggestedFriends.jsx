@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery, useMutation  } from "@tanstack/react-query"
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient    } from "@tanstack/react-query"
 import { getSingleRecommendeduser, getOutgoingFriendRequests ,getIncomingFriendRequests, addFriend } from "../lib/api.js"
 import { useEffect, useRef, useState } from "react";
 import {io} from 'socket.io-client';
@@ -10,7 +10,7 @@ export default function SuggestedFriends() {
   const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [filterRecommendAcc, setFilterRecommendAcc] = useState([]);
-
+  const queryClient = useQueryClient();
   const{
     data:recommended,
     hasNextPage,
@@ -53,12 +53,16 @@ export default function SuggestedFriends() {
     if(!authData?.user?._id) return;
     socket.current = io(backendUrl);
     socket.current.on(`outgoingFriendRequests${authData?.user?._id.toString()}`, () => {
-      outGoingFriendRequestsRefetch();
+      // outGoingFriendRequestsRefetch();
+      queryClient.invalidateQueries(["outgoingFriendRequests"]);
     });
 
+
     socket.current.on(`incomingFriendRequests${authData?.user?._id.toString()}`, () => {
-      incomingFriendRequestsRefetch();
+      // incomingFriendRequestsRefetch();
+      queryClient.invalidateQueries(["incomingFriendRequests"]);
     });
+
     const outgoingFriendRequests = getOutgoingFriend?.outgoingFriendRequests?.map((req) => req.reciptient?._id) || [];
     const incomingFriendRequests = getIncomingFriend?.incomingFriendRequests?.map((req) => req.sender?._id) || [];
     const flatRecommended = recommended?.pages?.flatMap((page) => page.recommendUser) || [];

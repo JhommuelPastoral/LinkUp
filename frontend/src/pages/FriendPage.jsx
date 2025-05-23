@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from "@tanstack/react-query"
+import { useInfiniteQuery , useQueryClient} from "@tanstack/react-query"
 import { getPaginatedFriends } from "../lib/api.js"
 import {useEffect, useRef } from "react";
 import { io } from "socket.io-client";
@@ -9,7 +9,7 @@ export default function FriendPage() {
   const {authData} = useAuthUser();
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const socket = useRef(null);
-
+  const queryClient = useQueryClient();
   const {
     data: userFriends=[], 
     fetchNextPage,
@@ -29,7 +29,8 @@ export default function FriendPage() {
     if(!authData?.user?._id) return;
     socket.current = io(backendUrl);
     socket.current.on(`acceptedFriendRequest${authData?.user?._id}`, () => {
-      userFriendsRefetch();
+      // userFriendsRefetch();
+      queryClient.invalidateQueries(["friends/page"]);
     });
 
 
