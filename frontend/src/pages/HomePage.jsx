@@ -1,6 +1,7 @@
 import PostCard from '../components/PostCard.jsx';
 import useAuthUser from '../hooks/useAuthUser.js';
 import CreatePost from '../components/CreatePost.jsx';
+import Myday from '../components/Myday.jsx';
 export default function HomePage() {
 
   return (
@@ -9,9 +10,7 @@ export default function HomePage() {
       <CreatePost />
 
       {/* My Day */}
-      <div className='w-[90%]  h-[80px]  mx-auto flex justify-center items-center '>
-        <p>Still Working On Myday Features</p>
-      </div>
+      <Myday />
 
       {/* Post Card */}
       <div className='max-w-[600px] mx-auto '>

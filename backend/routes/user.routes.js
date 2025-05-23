@@ -3,6 +3,7 @@ import protectedRoute from "../middleware/auth.middleware.js";
 import { getRecommendedFriends,addFriend, getOnlineUsers, getPaginatedFriends, getOutgoingFriendRequests,getIncomingFriendRequests, getSingleRecommendeduser, acceptFriendRequest,getFriends } from "../controllers/user.controllers.js";
 import { post,getPosts, likePosts, getAllUserPosts, AddComment, getSpecificPosts} from "../controllers/post.controllers.js";
 import { sendChat, getChat } from "../controllers/chat.controllers.js";
+import { createMyday , getAllMydays} from "../controllers/myday.controllers.js";
 const userRoutes =  (io) => {
   
   const router = express.Router();
@@ -29,7 +30,9 @@ const userRoutes =  (io) => {
   router.post("/sendchat",protectedRoute, (req, res) => sendChat(req, res,io));
   router.get('/getchat',protectedRoute, (req, res) => getChat(req, res,io));
 
-
+  //Myday
+  router.post("/createmyday",protectedRoute, (req, res) => createMyday(req, res,io));
+  router.get("/getmyday",protectedRoute, (req, res) => getAllMydays(req, res,io));
 
   return router;
 

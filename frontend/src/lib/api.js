@@ -211,3 +211,21 @@ export const getChat = async (data) => {
     throw Error(error.response?.data?.message || "Failed to fetch chat");
   }
 };
+
+export const createMyday = async (data)=>{
+  try {
+    const response = await axiosInstance.post(`/user/createmyday`,data);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
+
+export const getMyday = async ()=>{
+  try {
+    const response = await axiosInstance.get(`/user/getmyday`);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}

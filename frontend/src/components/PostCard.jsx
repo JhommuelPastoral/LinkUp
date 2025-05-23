@@ -185,7 +185,7 @@ function LikeImageWithEffect({ src, postId, isLiked, onLike }) {
       <img
         src={src}
         alt="Post"
-        className="w-full h-full rounded-lg select-none cursor-pointer object-contain"
+        className="w-[90%] h-full rounded-lg select-none cursor-pointer object-contain"
       />
       <AnimatePresence>
         {showHeart && (

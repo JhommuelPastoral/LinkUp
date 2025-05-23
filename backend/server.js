@@ -8,6 +8,7 @@ import userRoutes from './routes/user.routes.js';
 import http from 'http';
 import {Server} from 'socket.io';
 import User from './models/User.js';
+import {watchMyDayDeletions} from './watchers/MyDayWatcher.js';
 
 const app = express();
 dotenv.config();
@@ -53,7 +54,9 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes(io));
 app.use('/api/user',userRoutes(io));
 
-server.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
-  connectDB();
+connectDB().then(() => {
+  watchMyDayDeletions(io);
+  server.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
+  });
 });
