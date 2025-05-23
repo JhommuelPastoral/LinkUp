@@ -66,7 +66,7 @@ export default function Myday() {
   return (
     <>
       <div className=' mx-auto max-w-full  '>
-        <div className='flex gap-4 font-Poppins items-start overflow-auto max-w-screen '>
+        <div className='flex gap-4 font-Poppins items-start overflow-auto max-w-[calc(100vw-50px)] '>
           {/* CREATE STORY CARD */}
           <div className='text-center'>
             <div
