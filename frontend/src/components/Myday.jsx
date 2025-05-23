@@ -65,15 +65,15 @@ export default function Myday() {
 
   return (
     <>
-      <div className=' mx-auto max-w-full  '>
-        <div className='flex gap-4 font-Poppins items-start overflow-auto max-w-[calc(100vw-50px)] '>
+      <div className=' mx-auto max-w-full '>
+        <div className='flex gap-4 font-Poppins items-start overflow-auto max-w-[calc(100vw-50px)] scrollbar-hidden  '>
           {/* CREATE STORY CARD */}
           <div className='text-center'>
             <div
               className='flex flex-col items-center cursor-pointer'
               onClick={() => document.getElementById('my_modal_3').showModal()}
             >
-              <div className='w-28 h-40 rounded-2xl overflow-hidden border'>
+              <div className='w-28 h-40 rounded-2xl border'>
                 <img
                   src={mydayMine?.length === 0 ? authData?.user?.profileImage : mydayMine[0]?.image}
                   alt="Create story"
