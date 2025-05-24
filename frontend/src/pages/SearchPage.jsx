@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { findUser } from '../lib/api.js'
 import {Link} from 'react-router'
 import useAuthUser from '../hooks/useAuthUser.js'
-import { set } from 'mongoose'
 export default function SearchPage() {
   const [inputvalue, setInputvalue] = useState('')
   const [debouncedValue, setDebouncedValue] = useState('')
