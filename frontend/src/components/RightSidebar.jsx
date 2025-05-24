@@ -3,7 +3,7 @@ import {getRecommendUser, addFriend, getOutgoingFriendRequests,getIncomingFriend
 import { io } from "socket.io-client";
 import { useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {useLocation} from 'react-router'
+import {useLocation,matchPath} from 'react-router'
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { Link } from 'react-router';
@@ -21,7 +21,9 @@ export default function RightSidebar() {
     queryKey: ['recommendUser'],
     queryFn: getRecommendUser
   });
-  const hiddenLocation = ['/explore/friends', '/profile', '/message'];
+  const hiddenLocation = ['/explore/friends', '/profile', '/message', '/profile/:id'];
+  const shouldHideSidebar = hiddenLocation.some((path) => matchPath({ path, end: false }, currectLocation));
+
   const queryClient = useQueryClient();
 
   const {data: getOutgoingFriend=[], refetch: outGoingFriendRequestsRefetch} = useQuery({
@@ -96,10 +98,10 @@ export default function RightSidebar() {
     handleAddFriendMutation(userId);
   }
   return (
-    <div className={`p-5 flex flex-col font-Poppins gap-5 ${hiddenLocation.includes(currectLocation) ? 'hidden' : ''}`}>
-      <div className='flex  items-center'>
-        <div className='w-15 h-15 rounded-full  '>
-          <img src={authData?.user?.profileImage} alt={authData?.user?.fullname} className='w-15 h-15 object-cover object-center rounded-full' />
+    <div className={`p-5 flex flex-col font-Poppins gap-5 ${shouldHideSidebar ? 'hidden' : ''}`}>
+      <div className='flex items-center'>
+        <div className='rounded-full w-15 h-15 '>
+          <img src={authData?.user?.profileImage} alt={authData?.user?.fullname} className='object-cover object-center rounded-full w-15 h-15' />
         </div>
         <div className='flex flex-col ml-3'>
           <p className='text-sm'>{authData?.user?.fullname}</p>
@@ -107,21 +109,21 @@ export default function RightSidebar() {
         </div>
       </div>
       <p className='text-sm text-current/80'>Suggested for you</p>
-      {onlineUsers.length === 0 ?  <Link to="/explore/friends">  <p className='text-sm text-current/80 text-center'> No one is online <span className='link'>See more </span> </p> </Link>  :
+      {onlineUsers.length === 0 ?  <Link to="/explore/friends">  <p className='text-sm text-center text-current/80'> No one is online <span className='link'>See more </span> </p> </Link>  :
         (
           filterRecommendAcc?.map((user) => (
             user?.isOnline && (          
-              <div className='flex items-center flex-col' key={user._id}>
-                <div className='flex  items-center w-full'>
-                  <div className='w-15 h-15 rounded-full relative '>
-                    <img src={user?.profileImage} alt={user?.fullname} className='w-15 h-15  object-cover object-center rounded-full' />
-                    <div aria-label="success" className="status status-success absolute bottom-1 right-0 w-4 h-4 rounded-full"></div>
+              <div className='flex flex-col items-center' key={user._id}>
+                <div className='flex items-center w-full'>
+                  <div className='relative rounded-full w-15 h-15 '>
+                    <img src={user?.profileImage} alt={user?.fullname} className='object-cover object-center rounded-full w-15 h-15' />
+                    <div aria-label="success" className="absolute right-0 w-4 h-4 rounded-full status status-success bottom-1"></div>
                   </div>
                   <div className='flex flex-col ml-3'>
                     <p className='text-sm'>{user?.fullname}</p>
                     <p className='text-sm'>@{user?.fullname}</p>
                   </div>
-                  <button className="btn btn-sm ml-auto bg-primary" onClick={() => handleAddFriend(user._id)}>Add Friend</button>
+                  <button className="ml-auto btn btn-sm bg-primary" onClick={() => handleAddFriend(user._id)}>Add Friend</button>
                 </div>
               </div>
             )

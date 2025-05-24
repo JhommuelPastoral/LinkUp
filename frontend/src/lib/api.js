@@ -229,3 +229,21 @@ export const getMyday = async ()=>{
     throw  Error(error.response?.data?.message );
   }
 }
+
+export const getUserById = async (id)=>{
+  try {
+    const response = await axiosInstance.get(`/user/profile/${id}`);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
+
+export const getUserPostById = async (id)=>{
+  try {
+    const response = await axiosInstance.get(`/user/getuserposts/${id}`);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}

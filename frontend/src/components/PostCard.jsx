@@ -9,6 +9,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { motion, AnimatePresence } from "framer-motion";
 import CommentModal from "./CommentModal.jsx";
+import {Link} from 'react-router'
 dayjs.extend(relativeTime);
 
 export default function PostCard() {
@@ -97,26 +98,29 @@ export default function PostCard() {
           key={post._id}
           className="flex flex-col font-Poppins mb-4 lg:p-5 gap-2.5 border-b border-b-base-200"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="w-12 h-12 rounded-full">
-              <img
-                className="w-12 h-12 rounded-full object-cover"
-                src={post.userId.profileImage}
-                alt={post.userId.fullname}
-              />
+          <Link to={`/profile/${post.userId._id}`}>
+            <div className="flex items-center gap-2.5">
+              <div className="w-12 h-12 rounded-full">
+                <img
+                  className="object-cover w-12 h-12 rounded-full"
+                  src={post.userId.profileImage}
+                  alt={post.userId.fullname}
+                />
+              </div>
+              <div className="flex flex-col">
+                <p className="font-semibold flex gap-2.5 items-center">
+                  {post.userId.fullname}
+                  {post.userId.isOnline && (
+                    <span className="rounded-full status status-success" />
+                  )}
+                </p>
+                <p className="text-gray-500 text-sm flex items-center gap-2.5">
+                  <Clock size={16} /> {dayjs(post.createdAt).fromNow()}
+                </p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <p className="font-semibold flex gap-2.5 items-center">
-                {post.userId.fullname}
-                {post.userId.isOnline && (
-                  <span className="status status-success rounded-full" />
-                )}
-              </p>
-              <p className="text-gray-500 text-sm flex items-center gap-2.5">
-                <Clock size={16} /> {dayjs(post.createdAt).fromNow()}
-              </p>
-            </div>
-          </div>
+          
+          </Link>
 
           <p>{post.message}</p>
 
@@ -132,7 +136,7 @@ export default function PostCard() {
           <div className="flex items-center gap-10 mt-2.5">
             <Heart
               size={24}
-              className="cursor-pointer transition-transform duration-200 active:scale-125"
+              className="transition-transform duration-200 cursor-pointer active:scale-125"
               fill={post.likes.includes(authData.user._id) ? "red" : "none"}
               onClick={() => handleLike(post._id)}
             />
@@ -140,10 +144,10 @@ export default function PostCard() {
           </div>
 
           <div className="flex gap-5">
-            <p className="text-gray-500 font-semibold">
+            <p className="font-semibold text-gray-500">
               {post.likes.length} {post.likes.length === 1 ? "like" : "likes"}
             </p>
-            <p className="text-gray-500 font-semibold">
+            <p className="font-semibold text-gray-500">
               {post.comments.length} {post.comments.length === 1 ? "comment" : "comments"}
             </p>
           </div>
@@ -179,13 +183,13 @@ function LikeImageWithEffect({ src, postId, isLiked, onLike }) {
 
   return (
     <div
-      className="relative mt-2 rounded-lg overflow-hidden"
+      className="relative mt-2 overflow-hidden rounded-lg"
       onDoubleClick={handleDoubleClick}
     >
       <img
         src={src}
         alt="Post"
-        className="w-full h-full rounded-lg select-none cursor-pointer object-contain"
+        className="object-contain w-full h-full rounded-lg cursor-pointer select-none"
       />
       <AnimatePresence>
         {showHeart && (

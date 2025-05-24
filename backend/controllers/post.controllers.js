@@ -117,3 +117,15 @@ export const getSpecificPosts = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 }
+
+
+export const getUserPostById = async(req,res) => {
+  try {
+    const {id} = req.params;
+    const post = await Post.find({userId: id}).populate("comments.userId", "fullname profileImage").populate("userId", "fullname profileImage").sort({createdAt: -1});
+    res.status(200).json({allPosts: post});
+  } catch (error) {
+    console.log("getUserPostById Error", error.message);
+    res.status(500).json({message: error.message});
+  }
+}

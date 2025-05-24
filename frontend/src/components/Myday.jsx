@@ -65,7 +65,7 @@ export default function Myday() {
 
   return (
     <>
-      <div className=' mx-auto max-w-full '>
+      <div className='max-w-full mx-auto '>
         <div className='flex gap-4 font-Poppins items-start overflow-auto max-w-[calc(100vw-50px)] scrollbar-hidden  '>
           {/* CREATE STORY CARD */}
           <div className='text-center'>
@@ -73,14 +73,14 @@ export default function Myday() {
               className='flex flex-col items-center cursor-pointer'
               onClick={() => document.getElementById('my_modal_3').showModal()}
             >
-              <div className='w-28 h-40 rounded-2xl border'>
+              <div className='h-40 border border-base-300 w-28 rounded-2xl'>
                 <img
                   src={mydayMine?.length === 0 ? authData?.user?.profileImage : mydayMine[0]?.image}
                   alt="Create story"
-                  className="w-full h-full object-contain"
+                  className="object-cover object-center w-full h-full rounded-2xl"
                 />
               </div>
-              <Plus className='h-8 w-8 rounded-full -mt-4 bg-blue-500 text-white border' />
+              <Plus className='w-8 h-8 -mt-4 text-white bg-blue-500 border rounded-full' />
             </div>
             <p>{mydayMine?.length === 1 ? 'Update Story' : 'Create Story'}</p>
           </div>
@@ -99,14 +99,14 @@ export default function Myday() {
             ?.filter((item) => item.userId?._id !== authData?.user?._id)
             .map((item) => (
               <div className='flex flex-col' key={item._id}>
-                <div className='w-28 h-40 rounded-lg overflow-hidden border border-base-200'>
+                <div className='h-40 overflow-hidden border rounded-lg w-28 border-base-200'>
                   <img
                     src={item.image}
                     alt={item?.userId?.fullname}
-                    className="w-full h-full object-contain object-center"
+                    className="object-contain object-center w-full h-full"
                   />
                 </div>
-                <p className='text-center font-semibold'>{item?.userId?.fullname}</p>
+                <p className='font-semibold text-center'>{item?.userId?.fullname}</p>
               </div>
             ))}
         </div>
@@ -118,18 +118,18 @@ export default function Myday() {
         <div className="modal-box rounded-2xl" onClick={(e) => e.stopPropagation()}>
           <form method="dialog">
             <button
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              className="absolute btn btn-sm btn-circle btn-ghost right-2 top-2"
               onClick={() => setPreviewUrl(null)}
             >
               ✕
             </button>
           </form>
           <div className='space-y-4'>
-            <h3 className="font-bold text-lg">Story Preview</h3>
+            <h3 className="text-lg font-bold">Story Preview</h3>
             {previewUrl ? (
-              <img src={previewUrl} alt="Preview" className="max-h-80 mx-auto rounded-md" />
+              <img src={previewUrl} alt="Preview" className="mx-auto rounded-md max-h-80" />
             ) : (
-              <p className="text-gray-500 text-sm">No image selected.</p>
+              <p className="text-sm text-gray-500">No image selected.</p>
             )}
             <div className='flex justify-center gap-4'>
               <button

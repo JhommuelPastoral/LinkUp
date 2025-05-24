@@ -14,10 +14,11 @@ const app = express();
 dotenv.config();
 // https://linkup-3rmk.onrender.com
 // http://localhost:5173
+// https://linkup-production-e6c3.up.railway.app
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://linkup-3rmk.onrender.com",
+    origin: "https://linkup-production-e6c3.up.railway.app",
     credentials: true
   }
 });
@@ -45,7 +46,7 @@ io.on("connection", (socket) => {
 
 app.use(express.json({ limit: "50mb" }));
 app.use(cors({
-  origin: "https://linkup-3rmk.onrender.com",
+  origin: "https://linkup-production-e6c3.up.railway.app",
   credentials: true
 }));
 

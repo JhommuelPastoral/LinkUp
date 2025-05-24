@@ -172,3 +172,13 @@ export const getIncomingFriendRequests = async (req,res) => {
   }
 }
 
+export const getProfileById = async (req,res) => {
+  try {
+    const {id} = req.params;
+    // console.log(req.params)
+    const user = await User.findById(id).select("-password");
+    res.status(200).json({user});
+  } catch (error) {
+    console.log("getProfileById", error.message);
+  }
+}

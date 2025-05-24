@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 import toast from "react-hot-toast";
 import useAuthUser from "../hooks/useAuthUser.js";
 
-export default function CommentModal({ post, onClose }) {
+export default function CommentModal({ post, onClose, id }) {
   const { authData } = useAuthUser();
   const [commentData, setCommentData] = useState({
     userId: "",
@@ -87,7 +87,7 @@ export default function CommentModal({ post, onClose }) {
 return (
   <>
     <X 
-      className="fixed top-4 right-4 z-50 cursor-pointer md:top-5 md:right-10" 
+      className="fixed z-50 cursor-pointer top-4 right-4 md:top-5 md:right-10" 
       onClick={handleClose} 
     />
     <div className="modal-box relative w-full max-w-full md:max-w-[90%] lg:max-w-[80%] h-[90vh] flex flex-col md:flex-row p-0 overflow-hidden">
@@ -95,7 +95,7 @@ return (
       <div className="w-full md:w-[60%] lg:w-[70%] h-[40vh] md:h-full border-b md:border-b-0 md:border-r border-gray-600">
         <img
           src={post?.img}
-          className="w-full h-full object-contain"
+          className="object-contain w-full h-full"
           alt="Post"
         />
       </div>
@@ -107,30 +107,30 @@ return (
           <div className="flex items-center gap-2">
             <img
               src={post?.userId?.profileImage}
-              className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded-full object-cover"
+              className="object-cover w-8 h-8 rounded-full md:w-10 md:h-10 lg:w-12 lg:h-12"
               alt="User"
             />
-            <p className="text-xs md:text-sm font-semibold">{post?.userId?.fullname}</p>
+            <p className="text-xs font-semibold md:text-sm">{post?.userId?.fullname}</p>
           </div>
         </div>
 
         {/* Comments - scrollable area */}
         <div className="flex flex-col gap-2 md:gap-2.5 p-2 md:p-2.5 overflow-y-auto border-y md:border-y-0 md:border border-gray-600 flex-grow">
           {commentsLoading ? (
-            <p className="text-center text-sm">Loading Comments...</p>
+            <p className="text-sm text-center">Loading Comments...</p>
           ) : Comments?.length === 0 ? (
-            <p className="text-center text-sm text-gray-400">No comments yet</p>
+            <p className="text-sm text-center text-gray-400">No comments yet</p>
           ) : (
             Comments?.slice()?.reverse()?.map((comment) => (
               <div className="flex items-start gap-2 md:gap-2.5" key={comment._id}>
                 <img
                   src={comment?.userId?.profileImage}
-                  className="w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-full object-cover"
+                  className="object-cover rounded-full w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10"
                   alt="Commenter"
                 />
                 <div className="flex flex-col w-[90%]">
-                  <p className="text-xs md:text-sm font-semibold">{comment?.userId?.fullname}</p>
-                  <p className="text-xs md:text-sm break-words">{comment?.message}</p>
+                  <p className="text-xs font-semibold md:text-sm">{comment?.userId?.fullname}</p>
+                  <p className="text-xs break-words md:text-sm">{comment?.message}</p>
                 </div>
               </div>
             ))
@@ -139,9 +139,9 @@ return (
 
         {/* Comment Input */}
         <div className="flex w-full p-2 md:p-2.5 border-t border-gray-600 mt-auto">
-          <div className="w-full flex items-center gap-2">
+          <div className="flex items-center w-full gap-2">
             <textarea
-              className="textarea resize-none w-full text-xs md:text-sm p-2 rounded"
+              className="w-full p-2 text-xs rounded resize-none textarea md:text-sm"
               onChange={(e) =>
                 setCommentData({ ...commentData, comment: e.target.value })
               }
@@ -150,7 +150,7 @@ return (
               rows={1}
             ></textarea>
             <button 
-              className="btn bg-transparent text-xs md:text-sm px-2 py-1"
+              className="px-2 py-1 text-xs bg-transparent btn md:text-sm"
               onClick={handleSubmit}
             >
               Post

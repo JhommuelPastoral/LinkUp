@@ -89,7 +89,7 @@ export default function AllPost({ authData }) {
           <div className="flex items-center gap-2.5">
             <div className="w-12 h-12 rounded-full">
               <img
-                className="w-12 h-12 rounded-full object-cover"
+                className="object-cover w-12 h-12 rounded-full"
                 src={authData.profileImage}
                 alt={authData.fullname}
               />
@@ -100,7 +100,7 @@ export default function AllPost({ authData }) {
                 {authData.isOnline && (
                   <span
                     aria-label="success"
-                    className="status status-success rounded-full"
+                    className="rounded-full status status-success"
                   ></span>
                 )}
               </p>
@@ -128,10 +128,10 @@ export default function AllPost({ authData }) {
             <MessageCircle size={24} onClick={() => openModal(post)} className="cursor-pointer"/>
           </div>
           <div className='flex gap-5'>
-            <p className="text-gray-500 font-semibold">
+            <p className="font-semibold text-gray-500">
               {post.likes?.length} {post.likes?.length <= 1 ? "like" : "likes"}
             </p>          
-            <p className="text-gray-500 font-semibold">
+            <p className="font-semibold text-gray-500">
               {post?.comments?.length} {post?.comments?.length <= 1 ? "comment" : "comments"}
             </p>
           </div>
@@ -163,13 +163,13 @@ function LikeImageWithEffect({ src, postId, isLiked, onLike }) {
 
   return (
     <div
-      className="relative mt-2 rounded-lg overflow-hidden"
+      className="relative mt-2 overflow-hidden rounded-lg"
       onDoubleClick={handleDoubleClick}
     >
       <img
         src={src}
         alt="Post"
-        className="w-full h-full rounded-lg select-none cursor-pointer"
+        className="w-full h-full rounded-lg cursor-pointer select-none"
       />
       <AnimatePresence>
         {showHeart && (

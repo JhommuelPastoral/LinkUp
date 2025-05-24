@@ -1,7 +1,7 @@
 import express from "express";
 import protectedRoute from "../middleware/auth.middleware.js";
-import { getRecommendedFriends,addFriend, getOnlineUsers, getPaginatedFriends, getOutgoingFriendRequests,getIncomingFriendRequests, getSingleRecommendeduser, acceptFriendRequest,getFriends } from "../controllers/user.controllers.js";
-import { post,getPosts, likePosts, getAllUserPosts, AddComment, getSpecificPosts} from "../controllers/post.controllers.js";
+import { getProfileById,getRecommendedFriends,addFriend, getOnlineUsers, getPaginatedFriends, getOutgoingFriendRequests,getIncomingFriendRequests, getSingleRecommendeduser, acceptFriendRequest,getFriends } from "../controllers/user.controllers.js";
+import { post,getPosts, likePosts, getAllUserPosts, AddComment, getSpecificPosts, getUserPostById} from "../controllers/post.controllers.js";
 import { sendChat, getChat } from "../controllers/chat.controllers.js";
 import { createMyday , getAllMydays} from "../controllers/myday.controllers.js";
 const userRoutes =  (io) => {
@@ -25,6 +25,7 @@ const userRoutes =  (io) => {
   router.post("/likepost/:id",protectedRoute, (req, res) => likePosts(req, res,io));
   router.get('/getuserposts',protectedRoute, (req, res) => getAllUserPosts(req, res));
   router.get('/getspecificpost/:id',protectedRoute, (req, res) => getSpecificPosts(req, res));
+  router.get('/getuserposts/:id',protectedRoute, (req, res) => getUserPostById(req, res));
 
   //Chat 
   router.post("/sendchat",protectedRoute, (req, res) => sendChat(req, res,io));
@@ -34,6 +35,8 @@ const userRoutes =  (io) => {
   router.post("/createmyday",protectedRoute, (req, res) => createMyday(req, res,io));
   router.get("/getmyday",protectedRoute, (req, res) => getAllMydays(req, res,io));
 
+  // Profile View
+  router.get("/profile/:id",protectedRoute, (req, res) => getProfileById(req, res));
   return router;
 
 }
