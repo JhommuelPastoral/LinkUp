@@ -21,6 +21,15 @@ const postSchema = new mongoose.Schema({
     ref: "User"
     } ,
     message: String,
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    likes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }],
+
   }]
 },{timestamps: true});
 

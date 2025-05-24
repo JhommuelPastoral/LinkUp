@@ -247,3 +247,21 @@ export const getUserPostById = async (id)=>{
     throw  Error(error.response?.data?.message );
   }
 }
+
+export const addCommentLike = async (data)=>{
+  try {
+    const response = await axiosInstance.post(`/user/commentlike`,data);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
+
+export const findUser = async ({fullname})=>{
+  try {
+    const response = await axiosInstance.get(`/user/finduser?fullname=${fullname}`);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}

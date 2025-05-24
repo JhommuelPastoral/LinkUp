@@ -129,3 +129,32 @@ export const getUserPostById = async(req,res) => {
     res.status(500).json({message: error.message});
   }
 }
+
+
+export const addCommentLike = async (req,res,io) =>{
+  try {
+    const {postId, userId, commentId} = req.body;
+    const post = await Post.findById(postId);
+
+    if(!post) {
+      return res.status(400).json({message: "Post not found"});
+    }
+    const comment = post.comments.id(commentId);
+    const alreadyLiked = comment.likes.includes(userId);
+
+    if(alreadyLiked){
+      comment.likes.pull(userId);
+    }
+    else {
+      comment.likes.addToSet(userId);
+    }
+    await post.save();
+    io.emit(`likeComment${postId}`);
+    res.status(200).json({post, message: alreadyLiked ? 'Comment unliked' : 'Comment liked'});
+
+
+  } catch (error) {
+    console.log("addCommentLike error", error.message);
+    res.status(500).json({message: error.message});
+  }
+}

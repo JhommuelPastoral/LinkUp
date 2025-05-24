@@ -4,6 +4,7 @@ import { getIncomingFriendRequests , acceptFriendRequest} from '../lib/api.js';
 import {useMutation, useInfiniteQuery, useQueryClient} from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router';
 export default function FriendRequestPage() {
   const socket = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -62,31 +63,34 @@ export default function FriendRequestPage() {
 
   return (
     <div className="flex flex-col p-5  max-w-[600px] mx-auto font-Poppins gap-5" >
-        <p className="text-sm  ">Friend Requests</p>
-        {allRequests?.length === 0 && <p className="text-sm text-center font-semibold">No Friend Requests</p>}
+        <p className="text-sm ">Friend Requests</p>
+        {allRequests?.length === 0 && <p className="text-sm font-semibold text-center">No Friend Requests</p>}
 
         {allRequests?.map((acc,index) => (
-          <div className="flex justify-between items-center" key={index}>
-            <div className="flex gap-2.5 items-center ">
-              <div className="w-12 h-12 rounded-full">
-                <img
-                  src={acc?.sender?.profileImage}
-                  alt={acc?.sender?.fullname}
-                  className="w-12 h-12 object-cover object-center rounded-full"
-                />
+          <Link to={`/profile/${acc?.sender?._id}`}>
+            <div className="flex items-center justify-between" key={index}>
+              <div className="flex gap-2.5 items-center ">
+                <div className="w-12 h-12 rounded-full">
+                  <img
+                    src={acc?.sender?.profileImage}
+                    alt={acc?.sender?.fullname}
+                    className="object-cover object-center w-12 h-12 rounded-full"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold">{acc?.sender?.fullname}</p>
+                  <p className="text-xs">{acc?.sender?.bio}</p>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold">{acc?.sender?.fullname}</p>
-                <p className="text-xs">{acc?.sender?.bio}</p>
-              </div>
+              <button className="btn btn-sm" onClick={() => handleAccceptFriend(acc?.sender?._id)}> Accept Request</button>
             </div>
-            <button className="btn btn-sm" onClick={() => handleAccceptFriend(acc?.sender?._id)}> Accept Request</button>
-          </div>
+          
+          </Link>
           
         ))}
         {hasNextPage && (
         <button
-          className="btn btn-primary mt-4 self-center"
+          className="self-center mt-4 btn btn-primary"
           onClick={() => fetchNextPage()}
         >
           View More

@@ -14,7 +14,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-[1000px] mx-auto  font-Poppins p-5">
+    <div className="max-w-[800px] mx-auto  font-Poppins p-5">
       <Profile authData={authData}/>
     </div>
   )

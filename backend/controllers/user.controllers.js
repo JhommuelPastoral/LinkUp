@@ -182,3 +182,13 @@ export const getProfileById = async (req,res) => {
     console.log("getProfileById", error.message);
   }
 }
+
+export const findUser = async (req,res) => {
+  try {
+    const fullname = req.query.fullname;
+    const user = await User.find({fullname : {$regex: fullname, $options: "i"}}).select('-password');
+    res.status(200).json({user});
+  } catch (error) {
+    console.log("findUser", error.message);
+  }
+}

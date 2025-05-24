@@ -120,7 +120,7 @@ export default function MessagePage() {
 
   if (!authData) {
     return (
-      <div className="max-w-lg mx-auto gap-5 font-Poppins p-5 items-center flex justify-center min-h-screen skeleton bg-base-200">
+      <div className="flex items-center justify-center max-w-lg min-h-screen gap-5 p-5 mx-auto font-Poppins skeleton bg-base-200">
         <span className="loading loading-dots loading-lg"></span>
         <p>Loading...</p>
       </div>
@@ -142,7 +142,7 @@ export default function MessagePage() {
               }`}
             >
               <img
-                className="w-12 h-12 rounded-full object-cover"
+                className="object-cover w-12 h-12 rounded-full"
                 src={friend.profileImage}
                 alt={friend.fullname}
               />
@@ -160,7 +160,7 @@ export default function MessagePage() {
                 <img
                   src={selectedFriend?.profileImage}
                   alt={selectedFriend?.fullname}
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="object-cover w-12 h-12 rounded-full"
                 />
                 <p className="font-semibold">{selectedFriend?.fullname}</p>
               </div>
@@ -198,7 +198,7 @@ export default function MessagePage() {
                         </div>
                         <div className="chat-header">
                           {msg.senderId === authData.user._id ? 'You' : selectedFriend.fullname}
-                          <time className="text-xs opacity-50 ml-2">
+                          <time className="ml-2 text-xs opacity-50">
                             {dayjs(msg.date).format('HH:mm')}
                           </time>
                         </div>
@@ -206,7 +206,7 @@ export default function MessagePage() {
                           {msg.image && <img src={msg.image} className="h-20 mb-2" />}
                           {msg.text}
                         </div>
-                        <div className="chat-footer opacity-50">Delivered</div>
+                        <div className="opacity-50 chat-footer">Delivered</div>
                       </div>
                     ))}
                     {/* Scroll anchor */}
@@ -225,11 +225,11 @@ export default function MessagePage() {
                   <img
                     src={imagePreview}
                     alt="Preview"
-                    className="w-full h-full object-cover rounded-lg"
+                    className="object-cover w-full h-full rounded-lg"
                   />
                   <button
                     onClick={removeImagePreview}
-                    className="absolute top-1 right-1 bg-gray-800 p-1 rounded-full text-white hover:bg-gray-700"
+                    className="absolute p-1 text-white bg-gray-800 rounded-full top-1 right-1 hover:bg-gray-700"
                   >
                     <X size={16} />
                   </button>
@@ -239,7 +239,7 @@ export default function MessagePage() {
               <div className="flex flex-col gap-2">
                 <div className="flex h-20 items-center justify-between gap-2.5">
                   <textarea
-                    className="textarea resize-none w-full border-none rounded-2xl"
+                    className="w-full border-none resize-none textarea rounded-2xl"
                     placeholder="Send a message..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
@@ -258,7 +258,7 @@ export default function MessagePage() {
                     />
 
                     <button
-                      className="btn btn-soft flex items-center gap-2"
+                      className="flex items-center gap-2 btn btn-soft"
                       onClick={handleSendMessage}
                     >
                       <Send />
@@ -273,7 +273,7 @@ export default function MessagePage() {
       </div>
       
       {/* Moblie View */}
-      <div className='max-w-screen overflow-x-auto flex gap-2.5 mb-2.5'>
+      <div className='max-w-screen overflow-x-auto flex gap-2.5 mb-2.5 lg:hidden'>
         <div className={`flex ${isLoading ? 'skeleton' : ''}`}>
           {friends.map((friend) => (
             <div
@@ -284,11 +284,11 @@ export default function MessagePage() {
               }`}
             >
               <img
-                className="w-12 h-12 rounded-full object-cover"
+                className="object-cover w-12 h-12 rounded-full"
                 src={friend.profileImage}
                 alt={friend.fullname}
               />
-              <p  className="text-center text-sm max-w-full truncate">{friend.fullname} </p>
+              <p  className="max-w-full text-sm text-center truncate">{friend.fullname} </p>
             </div>
           ))}
         </div>
@@ -302,9 +302,9 @@ export default function MessagePage() {
             <img
               src={selectedFriend?.profileImage}
               alt={selectedFriend?.fullname}
-              className="w-10 h-10 rounded-full object-cover"
+              className="object-cover w-10 h-10 rounded-full"
             />
-            <p className="font-semibold text-sm">{selectedFriend?.fullname}</p>
+            <p className="text-sm font-semibold">{selectedFriend?.fullname}</p>
           </div>
 
           {/* Chat Messages */}
@@ -334,13 +334,13 @@ export default function MessagePage() {
                         />
                       </div>
                     </div>
-                    <div className="chat-header text-xs">
+                    <div className="text-xs chat-header">
                       {msg.senderId === authData.user._id ? 'You' : selectedFriend.fullname}
-                      <time className="text-xs opacity-50 ml-1">
+                      <time className="ml-1 text-xs opacity-50">
                         {dayjs(msg.date).format('HH:mm')}
                       </time>
                     </div>
-                    <div className="chat-bubble text-sm">
+                    <div className="text-sm chat-bubble">
                       {msg.image && <img src={msg.image} className="h-20 mb-2 rounded-md" />}
                       {msg.text}
                     </div>
@@ -362,11 +362,11 @@ export default function MessagePage() {
               <img
                 src={imagePreview}
                 alt="Preview"
-                className="w-full h-full object-cover rounded-lg"
+                className="object-cover w-full h-full rounded-lg"
               />
               <button
                 onClick={removeImagePreview}
-                className="absolute top-1 right-1 bg-gray-800 p-1 rounded-full text-white hover:bg-gray-700"
+                className="absolute p-1 text-white bg-gray-800 rounded-full top-1 right-1 hover:bg-gray-700"
               >
                 <X size={16} />
               </button>
@@ -377,7 +377,7 @@ export default function MessagePage() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2.5">
               <textarea
-                className="textarea textarea-bordered w-full h-16 rounded-xl resize-none"
+                className="w-full h-16 resize-none textarea textarea-bordered rounded-xl"
                 placeholder="Send a message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}

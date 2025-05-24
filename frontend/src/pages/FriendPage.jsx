@@ -3,6 +3,7 @@ import { getPaginatedFriends } from "../lib/api.js"
 import {useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import useAuthUser from "../hooks/useAuthUser.js";
+import { Link } from "react-router";
  
 
 export default function FriendPage() {
@@ -43,17 +44,18 @@ export default function FriendPage() {
   const allFriends = userFriends?.pages?.flatMap((page) => page.friends || []);
   return (
     <div className="flex flex-col p-5  max-w-[600px] mx-auto font-Poppins gap-5" >
-      <p className="text-2xl font-semibold  ">Friends</p>
+      <p className="text-2xl font-semibold ">Friends</p>
       {isLoading ? (<p>Loading friends...</p>) : allFriends?.length === 0 ? (<p>No friends yet 😢</p>) : 
         (
           allFriends?.map((acc,index) => (
-            <div className="flex justify-between items-center " key={index}>
+          <Link to={`/profile/${acc?._id}`}>
+            <div className="flex items-center justify-between " key={index}>
               <div className="flex gap-2.5 items-center ">
                 <div className="w-15 h-15 rounded-2xl">
                   <img
                     src={acc?.profileImage}
                     alt={acc?.fullname}
-                    className="w-15 h-15 object-cover object-center rounded-2xl"
+                    className="object-cover object-center w-15 h-15 rounded-2xl"
                   />
                 </div>
                 <div className="flex flex-col">
@@ -61,8 +63,12 @@ export default function FriendPage() {
                   <p className="text-xs">@{acc?.fullname}</p>
                 </div>
               </div>
-              <button className="btn btn-sm" > Send Message</button>
+              <Link to='/message'>
+                <button className="btn btn-sm" > Send Message</button>
+              </Link>
             </div>
+          
+          </Link>
             
           ))
         )
@@ -75,7 +81,7 @@ export default function FriendPage() {
         >
           {isLoading ? "Loading more..." : "Load More"}
         </button>
-      ): <p className="text-sm  text-center">No more friends</p> }
+      ): <p className="text-sm text-center">No more friends</p> }
 
     </div>
   )

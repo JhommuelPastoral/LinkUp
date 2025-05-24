@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {io} from 'socket.io-client';
 import useAuthUser  from "../hooks/useAuthUser.js";
 import toast from 'react-hot-toast';
+import { Link } from "react-router";
 
 export default function SuggestedFriends() {
   const { authData } = useAuthUser();
@@ -15,7 +16,8 @@ export default function SuggestedFriends() {
     data:recommended,
     hasNextPage,
     fetchNextPage,
-    refetch:refetchRecommended
+    refetch:refetchRecommended,
+    isFetchingNextPage
   }= useInfiniteQuery(
     {
       queryKey:["recommended"],
@@ -83,33 +85,40 @@ export default function SuggestedFriends() {
   }
   return (
     <div className="flex flex-col p-5  max-w-[600px] mx-auto font-Poppins gap-5" >
-        <p className="text-sm  ">Suggested Friends</p>
-        {filterRecommendAcc?.length === 0 && <p className="text-sm  ">No Friends</p>}
-        {filterRecommendAcc?.map((acc,index) => (
-          <div className="flex justify-between items-center" key={index}>
-            <div className="flex gap-2.5 items-center ">
-              <div className="w-12 h-12 rounded-full">
-                <img
-                  src={acc?.profileImage}
-                  alt={acc?.fullname}
-                  className="w-12 h-12 object-cover object-center rounded-full"
-                />
+        <p className="text-sm ">Suggested Friends</p>
+        {filterRecommendAcc?.length === 0 && <p className="text-sm ">No Friends</p>}
+        {isFetchingNextPage ? ( <div className="flex items-center gap-2.5"><span className="loading loading-dots loading-md"></span> <p>Loading....</p>   </div> ): (
+
+          filterRecommendAcc?.map((acc,index) => (
+            <Link to={`/profile/${acc?._id}`}>
+              <div className="flex items-center justify-between" key={index}>
+                <div className="flex gap-2.5 items-center ">
+                  <div className="w-12 h-12 rounded-full">
+                    <img
+                      src={acc?.profileImage}
+                      alt={acc?.fullname}
+                      className="object-cover object-center w-12 h-12 rounded-full"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-sm font-semibold">{acc?.fullname}</p>
+                    <p className="text-xs">{acc?.bio}</p>
+                  </div>
+                </div>
+                <button className="btn btn-sm" onClick={() => handleAddFriend(acc?._id)}> Send Request</button>
               </div>
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold">{acc?.fullname}</p>
-                <p className="text-xs">{acc?.bio}</p>
-              </div>
-            </div>
-            <button className="btn btn-sm" onClick={() => handleAddFriend(acc?._id)}> Send Request</button>
-          </div>
+            
+            </Link>
+            
+          ))
           
-        ))}
+        )}
         {hasNextPage ? (
           <button onClick={() => fetchNextPage()} className="btn">
             Load More
           </button>
         ) : (
-          <p className="text-center text-gray-500 mt-4">You're all caught up ✨</p>
+          isFetchingNextPage ?<p className="mt-4 text-center text-gray-500">You're all caught up ✨</p> : ''
         )}
 
     </div>

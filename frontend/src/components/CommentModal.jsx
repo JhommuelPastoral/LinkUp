@@ -1,11 +1,14 @@
-import { X } from "lucide-react";
+import { X, Heart } from "lucide-react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { addComment, getSpecificPosts } from "../lib/api.js";
+import { addComment, getSpecificPosts, addCommentLike } from "../lib/api.js";
 import { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import toast from "react-hot-toast";
 import useAuthUser from "../hooks/useAuthUser.js";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
+dayjs.extend(relativeTime);
 export default function CommentModal({ post, onClose, id }) {
   const { authData } = useAuthUser();
   const [commentData, setCommentData] = useState({
@@ -27,6 +30,12 @@ export default function CommentModal({ post, onClose, id }) {
     queryFn: () => getSpecificPosts(post._id),
     enabled: !!post?._id,
   });
+  const{mutate: likeCommentMutate} = useMutation({
+    mutationFn: addCommentLike,
+    // onSuccess: () => {
+    //   refetchComments();
+    // },
+  })
 
   const { mutate: addCommentMutate } = useMutation({
     mutationFn: (data) => addComment(data),
@@ -57,9 +66,13 @@ export default function CommentModal({ post, onClose, id }) {
     socket.current.on(`newComment${post._id}`, () => {
       queryClient.invalidateQueries({ queryKey: ["comments", post._id] });
     });
+    socket.current.on(`likeComment${post._id}`, () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", post._id] });
+    })
 
     return () => {
       socket.current.off(`newComment${post._id}` );
+      socket.current.off(`likeComment${post._id}`);
       socket.current.disconnect();
     };
   }, [post, refetchComments]);
@@ -82,8 +95,15 @@ export default function CommentModal({ post, onClose, id }) {
     onClose();
   };
 
-  const Comments = fetchData?.Allposts?.comments;
+    const handleLikeComment = (id) => {
+    likeCommentMutate({
+      postId: commentData.postId,
+      userId: authData?.user?._id,
+      commentId: id
+    });
 
+  };
+  const Comments = fetchData?.Allposts?.comments;
 return (
   <>
     <X 
@@ -129,7 +149,17 @@ return (
                   alt="Commenter"
                 />
                 <div className="flex flex-col w-[90%]">
-                  <p className="text-xs font-semibold md:text-sm">{comment?.userId?.fullname}</p>
+                  <div className="flex items-center justify-between gap-1">
+                    <div>
+                      <p className="text-xs font-semibold md:text-sm">{comment?.userId?.fullname}</p>
+                      <p className="text-xs text-gray-400"> {dayjs(comment?.createdAt).fromNow()}  </p>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-xs text-gray-400">{comment?.likes?.length} {comment?.likes?.length <= 1 ? "like" : "likes"} </span>
+                      <Heart className="cursor-pointer" size={18} onClick={ () => handleLikeComment(comment?._id)} fill={ comment?.likes?.includes(authData?.user?._id) ? "red" : "none"}/>
+
+                    </div>
+                  </div>
                   <p className="text-xs break-words md:text-sm">{comment?.message}</p>
                 </div>
               </div>
