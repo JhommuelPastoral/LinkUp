@@ -1,17 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import { findUser, getAllIncomingFriendRequests, getOutgoingFriendRequests, addFriend, acceptFriendRequest } from '../lib/api.js'
 import {Link} from 'react-router'
 import useAuthUser from '../hooks/useAuthUser.js'
 import toast from 'react-hot-toast';
+import {io} from 'socket.io-client';
 export default function SearchPage() {
   const [inputvalue, setInputvalue] = useState('')
   const [debouncedValue, setDebouncedValue] = useState('')
   const queryClient = useQueryClient()
   const {authData} = useAuthUser();
+  const socket = useRef(null);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
   const [friends, setFriends] = useState([]);
   const [outgoingFriendRequests, setOutgoingFriendRequests] = useState([]);
   const [incomingFriendRequests, setIncomingFriendRequests] = useState([]);
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedValue(inputvalue)
@@ -47,6 +51,24 @@ export default function SearchPage() {
     setIncomingFriendRequests(incoming);
   },[incomingFriend])
 
+  useEffect(() => {
+    socket.current = io(backendUrl);
+    socket.current.on(`outgoingFriendRequests${authData.user._id}`, (data) => {
+      queryClient.invalidateQueries('getAllIncomingFriendRequests');
+    });
+    socket.current.on(`incomingFriendRequests${authData.user._id}`, (data) => {
+      queryClient.invalidateQueries('getAllIncomingFriendRequests');
+      queryClient.invalidateQueries('findUsers');
+    });
+
+    return () => {
+      socket.current.off(`outgoingFriendRequests${authData.user._id}`);
+      socket.current.off(`incomingFriendRequests${authData.user._id}`);
+      socket.current.disconnect();
+
+    };
+
+  }, [authData.user._id]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['findUsers', debouncedValue],
@@ -77,15 +99,13 @@ export default function SearchPage() {
   });
 
 
-  const users = data?.user || []
+  const users = data?.user?.filter((user) => user._id !== authData.user._id) || []
   const handleAddFriend =  (id) => {
     handleAddFriendMutation(id);
-    console.log("id", id);
   };
 
   const handleAcceptFriendRequest =  (id) => {
     acceptFriendRequestMutation(id);
-    console.log("id", id);
   };
 
   return (
