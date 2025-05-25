@@ -60,6 +60,9 @@ export default function SearchPage() {
       queryClient.invalidateQueries('getAllIncomingFriendRequests');
       queryClient.invalidateQueries('findUsers');
     });
+    socket.current.on(`acceptedFriendRequest${authData.user._id}`, (data) => {
+      queryClient.invalidateQueries('findUsers');
+    });
 
     return () => {
       socket.current.off(`outgoingFriendRequests${authData.user._id}`);
