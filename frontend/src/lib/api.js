@@ -274,3 +274,21 @@ export const findUser = async ({fullname})=>{
     throw  Error(error.response?.data?.message );
   }
 }
+
+export const postVideo = async (data)=>{
+  try {
+    const response = await axiosInstance.post(`/user/postvideo`,data);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
+
+export const getVideo = async ()=>{
+  try {
+    const response = await axiosInstance.get(`/user/getvideo`);
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}

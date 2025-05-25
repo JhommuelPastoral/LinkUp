@@ -4,6 +4,9 @@ import { getAllIncomingFriendRequests ,findUser,getProfileById,getRecommendedFri
 import { post,getPosts, likePosts, getAllUserPosts, AddComment, getSpecificPosts, getUserPostById, addCommentLike} from "../controllers/post.controllers.js";
 import { sendChat, getChat } from "../controllers/chat.controllers.js";
 import { createMyday , getAllMydays} from "../controllers/myday.controllers.js";
+
+import upload from "../utils/multer.js"
+import {postVideo, getVideo} from "../controllers/video.controllers.js" 
 const userRoutes =  (io) => {
   
   const router = express.Router();
@@ -42,6 +45,14 @@ const userRoutes =  (io) => {
 
   // Comment Like
   router.post("/commentlike",protectedRoute, (req, res) => addCommentLike(req, res,io)); 
+
+  // Video Post
+  router.post("/postvideo",protectedRoute, upload.single("video") ,(req, res) => postVideo(req, res,io)); 
+  router.get("/getvideo",protectedRoute, (req, res) => getVideo(req, res));
+
+
+  
+
 
   return router;
 

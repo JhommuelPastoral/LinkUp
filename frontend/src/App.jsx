@@ -13,6 +13,8 @@ import FriendPage from './pages/FriendPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import MessagePage from './pages/MessagePage.jsx';
 import ProfileVisitPage from './pages/ProfileVisitPage.jsx';
+import ExplorePage from './pages/ExplorePage.jsx';
+
 
 import {Routes, Route} from 'react-router';
 import { Toaster } from 'react-hot-toast';
@@ -46,6 +48,7 @@ export default function App() {
         <Route path='/profile' element={ !isAuthenticated ? <Navigate to="/login" /> : !isOnboarding ? <Navigate to="/onboarding" /> :  <LayoutPage> <ProfilePage/></LayoutPage> }></Route>
         <Route path='/message' element={ !isAuthenticated ? <Navigate to="/login" /> : !isOnboarding ? <Navigate to="/onboarding" /> :  <LayoutPage> <MessagePage/></LayoutPage> }></Route>
         <Route path='/profile/:id' element={ !isAuthenticated ? <Navigate to="/login" /> : !isOnboarding ? <Navigate to="/onboarding" /> :  <LayoutPage> <ProfileVisitPage/></LayoutPage> }></Route>
+        <Route path='/explore' element={ !isAuthenticated ? <Navigate to="/login" /> : !isOnboarding ? <Navigate to="/onboarding" /> :  <LayoutPage> <ExplorePage/></LayoutPage> }></Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
