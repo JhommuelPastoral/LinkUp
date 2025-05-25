@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { findUser } from '../lib/api.js'
+import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+import { findUser, getAllIncomingFriendRequests, getOutgoingFriendRequests, addFriend, acceptFriendRequest } from '../lib/api.js'
 import {Link} from 'react-router'
 import useAuthUser from '../hooks/useAuthUser.js'
+import toast from 'react-hot-toast';
 export default function SearchPage() {
   const [inputvalue, setInputvalue] = useState('')
   const [debouncedValue, setDebouncedValue] = useState('')
   const queryClient = useQueryClient()
   const {authData} = useAuthUser();
   const [friends, setFriends] = useState([]);
+  const [outgoingFriendRequests, setOutgoingFriendRequests] = useState([]);
+  const [incomingFriendRequests, setIncomingFriendRequests] = useState([]);
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedValue(inputvalue)
@@ -23,16 +26,68 @@ export default function SearchPage() {
     setFriends(friend);
   }, [authData])
 
+  const {data: incomingFriend=[], refetch: incomingFriendRequestsRefetch} = useQuery({
+    queryKey: ['getAllIncomingFriendRequests'],
+    queryFn: getAllIncomingFriendRequests
+  });
+
+  const {data: outgoingFriend=[], refetch: outGoingFriendRequestsRefetch} = useQuery({
+    queryKey: ['outgoingFriendRequests'],
+    queryFn: getOutgoingFriendRequests
+  });
+
+  useEffect(() => {
+    const outgoing = outgoingFriend?.outgoingFriendRequests?.map((friend) => friend.reciptient?._id) || [];
+    setOutgoingFriendRequests(outgoing);
+
+  },[outgoingFriend]);
+  
+  useEffect(() => {
+    const incoming = incomingFriend?.incomingFriendRequests?.map((friend) => friend?.sender?._id) || [];
+    setIncomingFriendRequests(incoming);
+  },[incomingFriend])
+
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ['findUsers', debouncedValue],
     queryFn: () => findUser({ fullname: debouncedValue }),
     enabled: !!debouncedValue,
   })
 
+
+  const {mutate: handleAddFriendMutation} = useMutation({
+    mutationFn: addFriend,
+    onSuccess: () => {
+      toast.success('Friend request sent successfully!');
+      queryClient.invalidateQueries('outgoingFriendRequests');
+    },
+    onError: (error) => {
+      toast.error(error)
+    },
+  });
+  const{mutate: acceptFriendRequestMutation} = useMutation({
+    mutationFn: acceptFriendRequest,
+    onSuccess: () => {
+      toast.success('Friend request accepted successfully!');
+      queryClient.invalidateQueries(["incomingFriendRequests/page"]);
+    },
+    onError: (error) => {
+      toast.error(error)
+    },
+  });
+
+
   const users = data?.user || []
-  const handleRequest =  (id) => {
+  const handleAddFriend =  (id) => {
+    handleAddFriendMutation(id);
     console.log("id", id);
-  }
+  };
+
+  const handleAcceptFriendRequest =  (id) => {
+    acceptFriendRequestMutation(id);
+    console.log("id", id);
+  };
+
   return (
     <div className='max-w-[800px] mx-auto p-6 font-Poppins'>
       <h1 className='mb-4 text-2xl font-bold'>Find A User</h1>
@@ -70,16 +125,44 @@ export default function SearchPage() {
               </p>
             </div>
 
-            <div className={`flex justify-end ${friends.includes(user._id) ? 'hidden' : ''}`}>
-              <button
-                className="btn"
-                onClick={(e) => {
-                  e.stopPropagation() 
-                  handleRequest(user._id)
-                }}
-              >
-                Send Request
-              </button>
+            <div className={`flex justify-end `}>
+
+              {friends.includes(user._id)  ? (
+                <button className="rounded-lg btn bg-base-300 btn-disabled">
+                  Friend
+                </button>
+              ) : (
+                !outgoingFriendRequests.includes(user._id) && !incomingFriendRequests.includes(user._id) &&
+                <button
+                  className="rounded-lg btn bg-base-300 "
+                  onClick={(e) => {
+                    handleAddFriend(user._id)
+                  }}
+                >
+                  Add Friend
+                </button>
+              )}
+          
+              {outgoingFriendRequests.includes(user._id) && 
+                <button
+                  className="rounded-lg btn bg-base-300 btn-disabled"
+                >
+                  Request Sent
+                </button>
+              }
+              
+              {incomingFriendRequests.includes(user._id) && 
+                <button
+                  className="rounded-lg btn bg-base-300 "
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAcceptFriendRequest(user._id);
+                  }}
+                >
+                  Accept Request
+                </button>
+              }
+
             </div>
           </li>
         ))}

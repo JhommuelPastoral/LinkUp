@@ -67,8 +67,8 @@ export default function FriendRequestPage() {
         {allRequests?.length === 0 && <p className="text-sm font-semibold text-center">No Friend Requests</p>}
 
         {allRequests?.map((acc,index) => (
-          <Link to={`/profile/${acc?.sender?._id}`}>
-            <div className="flex items-center justify-between" key={index}>
+          <Link to={`/profile/${acc?.sender?._id}`} key={index}>
+            <div className="flex items-center justify-between" >
               <div className="flex gap-2.5 items-center ">
                 <div className="w-12 h-12 rounded-full">
                   <img

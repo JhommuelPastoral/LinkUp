@@ -107,6 +107,15 @@ export const getIncomingFriendRequests = async ({pageParam})=>{
   }
 }
 
+export const getAllIncomingFriendRequests = async ()=>{
+  try {
+    const response = await axiosInstance.get("/user/getAllIncomingFriendRequests");
+    return response.data;
+  } catch (error) {
+    throw  Error(error.response?.data?.message );
+  }
+}
+
 export const acceptFriendRequest = async (id)=>{
   try {
     const response = await axiosInstance.post(`/user/acceptFriendRequest/${id}`);

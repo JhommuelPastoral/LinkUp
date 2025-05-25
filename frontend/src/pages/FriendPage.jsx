@@ -48,9 +48,8 @@ export default function FriendPage() {
       {isLoading ? (<p>Loading friends...</p>) : allFriends?.length === 0 ? (<p>No friends yet 😢</p>) : 
         (
           allFriends?.map((acc,index) => (
-          <Link to={`/profile/${acc?._id}`}>
-            <div className="flex items-center justify-between " key={index}>
-              <div className="flex gap-2.5 items-center ">
+            <div key={index} className="flex items-center justify-between">
+              <Link to={`/profile/${acc?._id}`} className="flex gap-2.5 items-center">
                 <div className="w-15 h-15 rounded-2xl">
                   <img
                     src={acc?.profileImage}
@@ -62,14 +61,12 @@ export default function FriendPage() {
                   <p className="text-sm font-semibold">{acc?.fullname}</p>
                   <p className="text-xs">@{acc?.fullname}</p>
                 </div>
-              </div>
-              <Link to='/message'>
-                <button className="btn btn-sm" > Send Message</button>
+              </Link>
+              
+              <Link to="/message">
+                <button className="btn btn-sm">Send Message</button>
               </Link>
             </div>
-          
-          </Link>
-            
           ))
         )
       }

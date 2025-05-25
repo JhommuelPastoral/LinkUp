@@ -90,8 +90,8 @@ export default function SuggestedFriends() {
         {isFetchingNextPage ? ( <div className="flex items-center gap-2.5"><span className="loading loading-dots loading-md"></span> <p>Loading....</p>   </div> ): (
 
           filterRecommendAcc?.map((acc,index) => (
-            <Link to={`/profile/${acc?._id}`}>
-              <div className="flex items-center justify-between" key={index}>
+            <Link to={`/profile/${acc?._id}`} key={index}>
+              <div className="flex items-center justify-between" >
                 <div className="flex gap-2.5 items-center ">
                   <div className="w-12 h-12 rounded-full">
                     <img

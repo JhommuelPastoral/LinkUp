@@ -172,6 +172,15 @@ export const getIncomingFriendRequests = async (req,res) => {
   }
 }
 
+export const getAllIncomingFriendRequests = async (req,res) => {
+  try {
+    const incomingFriendRequests = await FriendRequest.find({reciptient: req.user._id,status: "pending",}).populate("sender", "fullname profileImage bio");
+    res.status(200).json({incomingFriendRequests});
+  } catch (error) {
+    console.log("getAllIncomingFriendRequests", error.message);
+  }
+}
+
 export const getProfileById = async (req,res) => {
   try {
     const {id} = req.params;

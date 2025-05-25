@@ -1,6 +1,6 @@
 import express from "express";
 import protectedRoute from "../middleware/auth.middleware.js";
-import { findUser,getProfileById,getRecommendedFriends,addFriend, getOnlineUsers, getPaginatedFriends, getOutgoingFriendRequests,getIncomingFriendRequests, getSingleRecommendeduser, acceptFriendRequest,getFriends } from "../controllers/user.controllers.js";
+import { getAllIncomingFriendRequests ,findUser,getProfileById,getRecommendedFriends,addFriend, getOnlineUsers, getPaginatedFriends, getOutgoingFriendRequests,getIncomingFriendRequests, getSingleRecommendeduser, acceptFriendRequest,getFriends } from "../controllers/user.controllers.js";
 import { post,getPosts, likePosts, getAllUserPosts, AddComment, getSpecificPosts, getUserPostById, addCommentLike} from "../controllers/post.controllers.js";
 import { sendChat, getChat } from "../controllers/chat.controllers.js";
 import { createMyday , getAllMydays} from "../controllers/myday.controllers.js";
@@ -18,6 +18,7 @@ const userRoutes =  (io) => {
   router.get("/getOutgoingFriendRequests",protectedRoute, (req, res) => getOutgoingFriendRequests(req, res, io ));
   router.get("/getIncomingFriendRequests",protectedRoute, (req, res) => getIncomingFriendRequests(req, res, io));
   router.get("/finduser",protectedRoute, (req, res) => findUser(req, res, io));
+  router.get("/getAllIncomingFriendRequests",protectedRoute, (req, res) => getAllIncomingFriendRequests(req, res, io));
 
   // Post
   router.post("/createpost",protectedRoute, (req, res) => post(req, res,io));
