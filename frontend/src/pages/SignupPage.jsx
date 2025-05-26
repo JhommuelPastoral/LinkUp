@@ -12,7 +12,7 @@ export default function SignupPage() {
     password: "",
   });
 
-  const { mutate: signupMutation, isLoading: isSignupLoading} = useMutation({
+  const { mutate: signupMutation, isPending: isSignupLoading} = useMutation({
     mutationFn: signup,
     onSuccess: () => {
       toast.success('Signup successfully!');
@@ -30,19 +30,19 @@ export default function SignupPage() {
   }
   return (
     <div className="mx-auto max-w-[1000px] gap-4 h-screen flex justify-center items-center font-Poppins bg-base-300 md:bg-base-100">
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4 bg-base-300 rounded-tr-xl rounded-br-xl">
+      <div className="flex flex-col items-center justify-center gap-4 md:flex-row bg-base-300 rounded-tr-xl rounded-br-xl">
         <div className="w-1/2  hidden md:block bg-[rgb(246,251,245)] rounded-tl-xl rounded-bl-xl">
           <img src="/SignUp.png" alt="" />
         </div>
         <div className="w-full md:w-1/2  flex flex-col  gap-4 p-[10px] ">
           <div className='p-[10px]'>
-            <p className='text-current font-light text-sm'>START FOR FREE</p>
-            <p className="text-current font-bold text-3xl">Create new account </p>
+            <p className='text-sm font-light text-current'>START FOR FREE</p>
+            <p className="text-3xl font-bold text-current">Create new account </p>
             <p className="text-sm">Already a member? <Link className="font-semibold" to="/login"> Sign in</Link> </p>
           </div>
           <form className="w-full px-2.5 space-y-4">
             <div className='flex flex-col space-y-1'>
-              <label className="input validator w-full">
+              <label className="w-full input validator">
                 <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <g
                     strokeLinejoin="round"
@@ -68,13 +68,13 @@ export default function SignupPage() {
                   onChange={(e) => setSignupData({ ...signupData, fullname: e.target.value })}
                 />
               </label>
-              <p className="validator-hint hidden">Must be 3 to 30 characters
+              <p className="hidden validator-hint">Must be 3 to 30 characters
                 <br />containing only letters
               </p>
             </div>
 
             <div className="flex flex-col">
-              <label className="input validator w-full">
+              <label className="w-full input validator">
                 <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <g
                     strokeLinejoin="round"
@@ -89,12 +89,12 @@ export default function SignupPage() {
                 </svg>
                 <input value={signupData.email} type="email" placeholder="JohnDoe@gmail.com" onChange={(e) => setSignupData({ ...signupData, email: e.target.value })} required />
               </label>
-              <div className="validator-hint hidden">Enter valid email address</div>      
+              <div className="hidden validator-hint">Enter valid email address</div>      
 
             </div>
 
             <div className="flex flex-col ">
-              <label className="input validator w-full">
+              <label className="w-full input validator">
                 <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <g
                     strokeLinejoin="round"
@@ -120,13 +120,13 @@ export default function SignupPage() {
                   title="Must be more than 6 characters, including number, lowercase letter, uppercase letter"
                 />
               </label>
-              <p className="validator-hint hidden">
+              <p className="hidden validator-hint">
                 Must be more than 6 characters, including
                 <br />At least one number <br />At least one lowercase letter <br />At least one uppercase letter
               </p>
             </div>
 
-            <button className="btn btn-primary w-full" onClick={handleSubmit} >{isSignupLoading ? (<span className='loading loading-spinner'></span> ) : 'Sign Up'}</button>
+            <button className="w-full btn btn-primary" onClick={handleSubmit} disabled={isSignupLoading} >{isSignupLoading ? (<span className='loading loading-spinner'></span> ) : 'Sign Up'}</button>
 
           </form>
 

@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   const queryClient = useQueryClient();
 
-  const { mutate: siginMutation } = useMutation({
+  const { mutate: siginMutation, isPending: isLoginLoading } = useMutation({
     mutationFn: login,
     onSuccess: () => {
       toast.success('Login successfully!');
@@ -37,16 +37,16 @@ export default function LoginPage() {
   return (
     
     <div className="mx-auto max-w-[1000px] gap-4 h-screen flex justify-center items-center font-Poppins bg-base-300 md:bg-base-100">
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4 bg-base-300 rounded-tr-xl rounded-br-xl">
+      <div className="flex flex-col items-center justify-center gap-4 md:flex-row bg-base-300 rounded-tr-xl rounded-br-xl">
         <div className="w-1/2  hidden md:block bg-[rgb(246,251,245)] rounded-tl-xl rounded-bl-xl">
           <img src="/Social.png" alt="" />
         </div>
         <div className="w-full md:w-1/2  flex flex-col items-center gap-4 p-[10px] ">
-          <p className="text-current font-bold text-3xl"> Welcome Back </p>
-          <p className="text-center font-light text-current text-sm">Wherever you dream of going, we make it easier to explore, connect, and experience the world like never before.</p>
+          <p className="text-3xl font-bold text-current"> Welcome Back </p>
+          <p className="text-sm font-light text-center text-current">Wherever you dream of going, we make it easier to explore, connect, and experience the world like never before.</p>
           <form className="w-full px-2.5 space-y-4">
             <div className="flex flex-col">
-              <label className="input validator w-full">
+              <label className="w-full input validator">
                 <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <g
                     strokeLinejoin="round"
@@ -61,12 +61,12 @@ export default function LoginPage() {
                 </svg>
                 <input value={siginData.email} type="email" placeholder="JohnDoe@gmail.com" onChange={(e) => setSiginData({ ...siginData, email: e.target.value })} required />
               </label>
-              <div className="validator-hint hidden">Enter valid email address</div>      
+              <div className="hidden validator-hint">Enter valid email address</div>      
 
             </div>
 
             <div className="flex flex-col ">
-              <label className="input  w-full">
+              <label className="w-full input">
                 <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <g
                     strokeLinejoin="round"
@@ -94,8 +94,8 @@ export default function LoginPage() {
 
             </div>
 
-            <button className="btn btn-primary w-full" onClick={handleSubmit} >Sign In</button>
-            <p className="text-center text-sm">Don't have an account? <Link className="font-semibold" to="/signup"> Sign up</Link> </p>
+            <button className="w-full btn btn-primary" onClick={handleSubmit} disabled={isLoginLoading}> {isLoginLoading  ?  <div className="flex gap-2.5 items-center"><span className="loading loading-spinner ">  </span> Signing in</div>    : "Sign in"}</button>
+            <p className="text-sm text-center">Don't have an account? <Link className="font-semibold" to="/signup"> Sign up</Link> </p>
 
           </form>
 

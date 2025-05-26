@@ -141,11 +141,11 @@ export default function ExplorePage() {
     setVideofile(file);
   };
 
-  const { mutate: uploadVideoMutation } = useMutation({
+  const { mutate: uploadVideoMutation, isPending: isUploading } = useMutation({
+    mutationFn: postVideo,
     onMutate: () => {
       toast.loading('Uploading video...', { id: 'upload-video' });
     },
-    mutationFn: postVideo,
     onSuccess: () => {
       toast.success('Video uploaded successfully', { id: 'upload-video' });
       setVideofile(null);
@@ -162,6 +162,9 @@ export default function ExplorePage() {
   });
 
   const handleSubmit = () => {
+
+    if(!videofile) return toast.error('Please select a video');
+
     const formData = new FormData();
     formData.append('video', videofile);
     uploadVideoMutation(formData);
@@ -225,17 +228,25 @@ export default function ExplorePage() {
             />
 
             <button
-              className="px-4 py-2 text-sm font-medium text-gray-700 transition bg-gray-200 rounded-lg hover:bg-gray-300"
+              type="button"
+              disabled={isUploading}
+              className={`btn px-4 py-2 text-sm font-medium text-gray-700 transition bg-gray-200 rounded-lg hover:bg-gray-300 ${
+                isUploading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               onClick={() => document.getElementById('file').click()}
             >
               Select File
             </button>
 
             <button
-              className="px-4 py-2 text-sm font-medium text-white transition bg-blue-600 rounded-lg hover:bg-blue-700"
+              type="button"
+              disabled={isUploading}
+              className={`px-4 py-2 text-sm font-medium text-white transition bg-blue-600 rounded-lg hover:bg-blue-700 btn ${
+                isUploading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               onClick={handleSubmit}
             >
-              Post Video
+              {isUploading ? 'Uploading...' : 'Post Video'}
             </button>
           </div>
         </div>
