@@ -18,7 +18,7 @@ dotenv.config();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://linkup-production-e6c3.up.railway.app",
+    origin: "https://linkup-wxs3.onrender.com",
     credentials: true
   }
 });
@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
 
 app.use(express.json({ limit: "50mb" }));
 app.use(cors({
-  origin: "https://linkup-production-e6c3.up.railway.app",
+  origin: "https://linkup-wxs3.onrender.com",
   credentials: true
 }));
 
